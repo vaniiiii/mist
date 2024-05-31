@@ -86,6 +86,7 @@ contract Myst {
         address receiver,
         address tokenAddress,
         uint256 amount,
+        bytes calldata ephemeralPubKey,
         bytes calldata metadata
     ) external {
         if (amount == 0) {
@@ -100,7 +101,7 @@ contract Myst {
             SCHEME_ID,
             receiver,
             msg.sender,
-            abi.encodePacked(tokenAddress, amount),
+            ephemeralPubKey,
             metadata
         );
     }
@@ -116,6 +117,7 @@ contract Myst {
         address receiver,
         address tokenAddress,
         uint256 tokenId,
+        bytes calldata ephemeralPubKey,
         bytes calldata metadata
     ) external {
         if (receiver == address(0) || tokenAddress == address(0)) {
@@ -127,7 +129,7 @@ contract Myst {
             SCHEME_ID,
             receiver,
             msg.sender,
-            abi.encodePacked(tokenAddress, tokenId),
+            ephemeralPubKey,
             metadata
         );
     }
