@@ -1,4 +1,7 @@
-import type { OnRpcRequestHandler } from '@metamask/snaps-sdk';
+import type {
+  OnCronjobHandler,
+  OnRpcRequestHandler,
+} from '@metamask/snaps-sdk';
 import { panel, text } from '@metamask/snaps-sdk';
 
 /**
@@ -30,6 +33,24 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
           ]),
         },
       });
+    default:
+      throw new Error('Method not found.');
+  }
+};
+
+export const onCronjob: OnCronjobHandler = async ({ request }) => {
+  switch (request.method) {
+    case 'execute':
+      // Cron jobs can execute any method that is available to the Snap.
+      // return snap.request({
+      //   method: 'snap_notify',
+      //   params: {
+      //     type: 'native',
+      //     message: 'Hello, world!',
+      //   },
+      // });
+      return;
+
     default:
       throw new Error('Method not found.');
   }
