@@ -14,7 +14,7 @@ const SendPage = () => {
         console.log(`Recipient: ${recipient}, Amount: ${amount}, Token: ${selectedToken}`);
     };
 
-    const handleSelectToken = (token: React.SetStateAction<string>) => {
+    const handleSelectToken = (token: any) => {
         setSelectedToken(token);
     };
 
