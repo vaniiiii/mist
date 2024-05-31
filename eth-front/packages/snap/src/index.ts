@@ -3,6 +3,7 @@ import type {
   OnRpcRequestHandler,
 } from '@metamask/snaps-sdk';
 import { panel, text } from '@metamask/snaps-sdk';
+import { ethers } from 'ethers';
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -18,6 +19,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   origin,
   request,
 }) => {
+  console.log(request);
   switch (request.method) {
     case 'hello':
       return snap.request({
@@ -25,7 +27,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         params: {
           type: 'confirmation',
           content: panel([
-            text(`Hello, **${origin}**!`),
+            text(`Hello, **${origin}**! Block number is ${await test()}.`),
             text('This custom confirmation is just for display purposes.'),
             text(
               'But you can edit the snap source code to make it do something, if you want to!',
@@ -33,6 +35,25 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
           ]),
         },
       });
+      case 'update':
+        console.log("updatejtujem")
+        return snap.request({
+          method: 'snap_manageState',
+          params: {
+            operation: 'update',
+            newState: {
+              publicKey: "sdasdads"
+            }
+          },
+        })
+        case 'get':
+          return snap.request({
+            method: 'snap_manageState',
+            params: {
+              operation: 'get',
+              encrypted: false
+            }
+          })
     default:
       throw new Error('Method not found.');
   }
@@ -55,3 +76,10 @@ export const onCronjob: OnCronjobHandler = async ({ request }) => {
       throw new Error('Method not found.');
   }
 };
+
+const test = async () => {
+  const provider = new ethers.JsonRpcProvider();
+  const blockNumber = await provider.getBlockNumber();
+
+  return blockNumber;
+}

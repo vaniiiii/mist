@@ -5,7 +5,6 @@ import styled from 'styled-components';
 import { Footer, Header } from './components';
 import { GlobalStyle } from './config/theme';
 import { ToggleThemeContext } from './Root';
-import { RouterProvider } from 'react-router-dom';
 
 const Wrapper = styled.div`
   display: flex;
@@ -27,7 +26,6 @@ export const App: FunctionComponent<AppProps> = ({ children }) => {
       <GlobalStyle />
       <Wrapper>
         <Header handleToggleClick={toggleTheme} />
-        {/* <RouterProvider router={router} /> */}
         {children}
         <Footer />
       </Wrapper>

@@ -83,7 +83,7 @@ export const dark: DefaultTheme = {
     background: {
       default: '#24272A',
       alternative: '#141618',
-      inverse: '#FFFFFF',
+      inverse: '#FFFFFF'
     },
     icon: {
       default: '#FFFFFF',
