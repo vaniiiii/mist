@@ -135,14 +135,43 @@ const SetupPage = () => {
     const privateKey1 = ethers.getBigInt(hashedV) % n;
     const privateKey2 = ethers.getBigInt(hashedR) % n;
 
-    const keyPair1 = new ethers.Wallet("0x" + privateKey1.toString(16));
-    const keyPair2 = new ethers.Wallet("0x" + privateKey2.toString(16));
+    const keyPair1 = new ethers.Wallet('0x' + privateKey1.toString(16));
+    const keyPair2 = new ethers.Wallet('0x' + privateKey2.toString(16));
 
-    const spendingPublicKey = keyPair1.signingKey.compressedPublicKey
-    const viewingPublicKey = keyPair2.signingKey.compressedPublicKey
+    const spendingPublicKey = keyPair1.signingKey.compressedPublicKey;
+    const viewingPublicKey = keyPair2.signingKey.compressedPublicKey;
 
     console.log(spendingPublicKey);
     console.log(viewingPublicKey);
+
+    const state = await invokeSnap({
+      method: 'update',
+      params: {
+        spendingPublicKey,
+        viewingPublicKey,
+      },
+    });
+
+    // const state = await provider?.request({
+    //   method: 'snap_manageState',
+    //   params: {
+    //     operation: 'update',
+    //     newState: {
+    //       spendingPublicKey,
+    //       viewingPublicKey,
+    //     },
+    //   },
+    // });
+
+    console.log(state);
+  };
+
+  const getSnapState = async () => {
+    const state = await invokeSnap({
+      method: 'get'
+    });
+
+    console.log(state);
   };
 
   const signMessageBlock = () => {
@@ -155,6 +184,7 @@ const SetupPage = () => {
         <DFlex>
           <MAuto>
             <SetupButton onClick={signMessage}>Setup</SetupButton>
+            <SetupButton onClick={getSnapState}>Read State</SetupButton>
           </MAuto>
         </DFlex>
       </SignContent>
