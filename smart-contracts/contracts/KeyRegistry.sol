@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.24;
 
+import {console} from "forge-std/Test.sol";
+
 /**
  * @title  KeyRegistry
  * @author vani(@vaniiiii)
@@ -9,10 +11,17 @@ pragma solidity 0.8.24;
  */
 contract KeyRegistry {
     //////////////////////////////////////////////////////////////////////////
+    //                              Constants                               //
+    //////////////////////////////////////////////////////////////////////////
+    uint256 public constant N =
+        115792089237316195423570985008687907852837564279074904382605163141518161494337; // secp256k1 order
+
+    //////////////////////////////////////////////////////////////////////////
     //                          Storage variables                           //
     //////////////////////////////////////////////////////////////////////////
     mapping(address userAddress => mapping(uint256 keyPrefix => uint256 keyValue))
         public stealthMetaAddresses;
+
     //////////////////////////////////////////////////////////////////////////
     //                                Events                                //
     //////////////////////////////////////////////////////////////////////////
@@ -23,10 +32,12 @@ contract KeyRegistry {
         uint256 viewingPubKeyPrefix,
         uint256 viewingPubKey
     );
+
     //////////////////////////////////////////////////////////////////////////
     //                                Errors                                //
     //////////////////////////////////////////////////////////////////////////
     error KeyRegistry__InvalidPrefix();
+    error KeyRegistry__InvalidKeyValue();
     error KeyRegistry__StealthMetaAddressAlreadyRegistered();
     error KeyRegistry__StealthMetaAddressNotFound();
 
@@ -45,7 +56,12 @@ contract KeyRegistry {
         uint256 viewingPubKey
     ) external {
         // Validate if stealth-meta address is already registered and in right format
-        _checkStealthMetaAddress(spendingPubKeyPrefix, viewingPubKeyPrefix);
+        _checkStealthMetaAddress(
+            spendingPubKeyPrefix,
+            spendingPubKey,
+            viewingPubKeyPrefix,
+            viewingPubKey
+        );
 
         emit StealthMetaAddressRegistered(
             msg.sender,
@@ -96,8 +112,9 @@ contract KeyRegistry {
             viewingPubKey = stealthMetaAddresses[userAddress][3];
         }
 
-        if (spendingPubKey == 0 || viewingPubKey == 0)
+        if (spendingPubKey == 0 || viewingPubKey == 0) {
             revert KeyRegistry__StealthMetaAddressNotFound();
+        }
 
         return (
             spendingPubKeyPrefix,
@@ -117,7 +134,9 @@ contract KeyRegistry {
      */
     function _checkStealthMetaAddress(
         uint256 spendingPubKeyPrefix,
-        uint256 viewingPubKeyPrefix
+        uint256 spendingPubKey,
+        uint256 viewingPubKeyPrefix,
+        uint256 viewingPubKey
     ) internal view {
         // Check if prefixes are valid
         if (spendingPubKeyPrefix < 2 || spendingPubKeyPrefix > 3) {
@@ -126,6 +145,14 @@ contract KeyRegistry {
         if (viewingPubKeyPrefix < 2 || viewingPubKeyPrefix > 3) {
             revert KeyRegistry__InvalidPrefix();
         }
+        // Check if keys are valid
+        if (spendingPubKey == 0 || spendingPubKey >= N) {
+            revert KeyRegistry__InvalidKeyValue();
+        }
+        if (viewingPubKey == 0 || viewingPubKey >= N) {
+            revert KeyRegistry__InvalidKeyValue();
+        }
+
         uint256 spendingKeyPrefixCheck = 1;
         uint256 viewingKeyPrefixCheck = 3;
 

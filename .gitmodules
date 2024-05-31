@@ -1,0 +1,3 @@
+[submodule "smart-contracts/lib/solady"]
+	path = smart-contracts/lib/solady
+	url = https://github.com/vectorized/solady
