@@ -15,6 +15,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   origin,
   request,
 }) => {
+  console.log(request);
   switch (request.method) {
     case 'hello':
       return snap.request({
@@ -30,6 +31,25 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
           ]),
         },
       });
+      case 'update':
+        console.log("updatejtujem")
+        return snap.request({
+          method: 'snap_manageState',
+          params: {
+            operation: 'update',
+            newState: {
+              publicKey: "sdasdads"
+            }
+          },
+        })
+        case 'get':
+          return snap.request({
+            method: 'snap_manageState',
+            params: {
+              operation: 'get',
+              encrypted: false
+            }
+          })
     default:
       throw new Error('Method not found.');
   }
