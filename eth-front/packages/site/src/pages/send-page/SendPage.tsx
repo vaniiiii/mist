@@ -145,7 +145,7 @@ const SendPage: React.FC = () => {
                             required
                             className="custom-input"
                         />
-                        <Button variant="secondary" className="max-button">Max</Button>
+                
                     </div>
                 </Form.Group>
 
