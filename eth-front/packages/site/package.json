@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@metamask/providers": "^16.0.0",
+    "buffer": "^6.0.3",
     "ethers": "^6.12.1",
     "localforage": "^1.10.0",
     "match-sorter": "^6.3.4",

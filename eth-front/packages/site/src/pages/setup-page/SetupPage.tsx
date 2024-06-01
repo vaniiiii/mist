@@ -10,6 +10,8 @@ import {
 import { isLocalSnap, shouldDisplayReconnectButton } from '../../utils';
 import styled from 'styled-components';
 import { ethers, hexlify, toUtf8Bytes } from 'ethers';
+import * as secp from '@noble/secp256k1';
+import * as sha3 from 'js-sha3';
 import { Maybe } from '@metamask/providers/dist/types/utils';
 import toast, { Toaster } from 'react-hot-toast';
 import { Spinner } from 'react-bootstrap';
@@ -80,9 +82,12 @@ const SignTitle = styled.div`
 interface MistState {
   spendingPublicKey: string;
   viewingPublicKey: string;
+  spendingPrivateKey?: string;
+  viewingPrivateKey?: string;
 }
 
 const CONTRACT_ADDRESS = '0xB975979f60EE73A9b0E807cD11634300d1f26644';
+window.Buffer = window.Buffer || require('buffer').Buffer;
 
 const SetupPage = () => {
   const [loadingSetup, setLoadingSetup] = useState(false);
@@ -125,10 +130,7 @@ const SetupPage = () => {
     );
   };
 
-  const signMessage = async () => {
-    setLoadingSetup(true);
-    const msg = hexlify(toUtf8Bytes(message));
-
+  const getUserAddress = async () => {
     const accounts: Maybe<string[]> = await provider?.request({
       method: 'eth_requestAccounts',
     });
@@ -136,9 +138,39 @@ const SetupPage = () => {
     if (!accounts || !accounts[0])
       return toast.error("Can't acquire users accounts");
 
+    return accounts[0];
+  };
+
+  const convert = (uint8Arr: Uint8Array) => {
+    var length = uint8Arr.length;
+
+    let buffer = Buffer.from(uint8Arr);
+    var result = buffer.readUIntBE(0, length);
+
+    return result;
+  };
+
+  const uint8ArrayToHex = (arr: Uint8Array) => {
+    return (
+      '0x' +
+      Array.from(arr, (byte) => byte.toString(16).padStart(2, '0')).join('')
+    );
+  };
+
+  // Helper function to convert hex string to BigInt
+  const hexToBigInt = (hex: string) => {
+    return BigInt(hex);
+  };
+
+  const signMessage = async () => {
+    setLoadingSetup(true);
+    const msg = hexlify(toUtf8Bytes(message));
+
+    const account = await getUserAddress();
+
     const signature: Maybe<string> = await provider?.request({
       method: 'personal_sign',
-      params: [msg, accounts[0]],
+      params: [msg, account],
     });
 
     if (!signature) return toast.error('Error signing the message');
@@ -152,29 +184,67 @@ const SetupPage = () => {
       '0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141',
     );
 
-    const privateKey1 = ethers.getBigInt(hashedV) % n;
+    // Ovo ide u contract ovako kao uint256(ne menja se format)
+    const privateKey1 = ethers.getBigInt(hashedV) % n; // r analogija
     const privateKey2 = ethers.getBigInt(hashedR) % n;
 
-    const keyPair1 = new ethers.Wallet('0x' + privateKey1.toString(16));
-    const keyPair2 = new ethers.Wallet('0x' + privateKey2.toString(16));
+    console.log('privateKey1: ', privateKey1); // k -> spending key
+    console.log('privateKey2: ', privateKey2); // v -> viewing key
 
-    const spendingPublicKey = keyPair1.signingKey.compressedPublicKey;
-    const viewingPublicKey = keyPair2.signingKey.compressedPublicKey;
+    // Ovde vadite prvi bajt i cuvate ga kao prefix (0x02 ili 0x03 mora biti)
+    const spendingPublicKey = secp.getPublicKey(privateKey1, true); // kG
+    console.log('spendingPublicKey: ', spendingPublicKey);
+    // Ovde vadite prvi bajt i cuvate ga kao prefix (0x02 ili 0x03 mora biti)
+    const viewingPublicKey = secp.getPublicKey(privateKey2, true); // vG
+    console.log('viewingPublicKey: ', viewingPublicKey);
+    // Na contract saljete prefix kao uint256 i bez prefixa ostatak isto kao uint256
+    // Primer: 0x0312131, saljete 3 kao prefix i 12131 kao key
 
+    // Generate random ephemeral private key r
+    const r = secp.utils.randomPrivateKey(); // r
+
+    // Calculate the ephemeral public key R = r * G
+    const ephemeralPublicKeyCompressed = secp.getPublicKey(r, true);
+    console.log('ephemeralPublicKeyCompressed', ephemeralPublicKeyCompressed);
+
+    // shared secret = r * vG
+    const sharedSecret = secp.getSharedSecret(r, viewingPublicKey);
+    console.log('sharedSecret:', sharedSecret);
+
+    // shared secret 2 = v * rG, they should be equal
+    const sharedSecret2 = secp.getSharedSecret(
+      privateKey2,
+      ephemeralPublicKeyCompressed,
+    );
+    console.log('sharedSecret2:', sharedSecret2);
+    let boolValue = true;
+    for (let i = 0; i < sharedSecret.length; i++) {
+      if (sharedSecret[i] !== sharedSecret2[i]) {
+        boolValue = false;
+        break;
+      }
+    }
+    console.log('sharedSecrets are equal:', boolValue);
+
+    console.log('spendingPubKey', uint8ArrayToHex(spendingPublicKey));
+    console.log('viewingPubKey', uint8ArrayToHex(viewingPublicKey));
+    console.log('privateKey1', privateKey1);
+    console.log('privateKey2', privateKey2);
     await invokeSnap({
       method: 'updateState',
       params: {
-        spendingPublicKey,
-        viewingPublicKey,
-        spendingPrivateKey: keyPair1.privateKey,
-        viewingPrivateKey: keyPair2.privateKey,
+        spendingPublicKey: uint8ArrayToHex(spendingPublicKey),
+        viewingPublicKey: uint8ArrayToHex(viewingPublicKey),
+        spendingPrivateKey: privateKey1.toString(),
+        viewingPrivateKey: privateKey2.toString(),
       },
     });
 
     await registerKeyContract({
-      spendingPublicKey,
-      viewingPublicKey
+      spendingPublicKey: uint8ArrayToHex(spendingPublicKey),
+      viewingPublicKey: uint8ArrayToHex(viewingPublicKey),
     });
+
     setLoadingSetup(false);
     toast.success('Successfully Generated Mist Keys');
   };
@@ -189,22 +259,26 @@ const SetupPage = () => {
       signer,
     );
 
-    if(!contract) return;
+    if (!contract) return;
 
-    let {spendingPublicKey, viewingPublicKey} = state;
+    let { spendingPublicKey, viewingPublicKey } = state;
 
     console.log(spendingPublicKey);
     console.log(viewingPublicKey);
 
     const parsePublicKey = (publicKey: string) => {
-      const hexString = publicKey.startsWith('0x') ? publicKey.slice(2) : publicKey;
+      const hexString = publicKey.startsWith('0x')
+        ? publicKey.slice(2)
+        : publicKey;
       const prefix = parseInt(hexString.slice(0, 2), 16);
       const key = BigInt('0x' + hexString.slice(2));
       return { prefix, key };
     };
 
-    const { prefix: spendingPubKeyPrefix, key: spendingPubKey } = parsePublicKey(spendingPublicKey);
-    const { prefix: viewingPubKeyPrefix, key: viewingPubKey } = parsePublicKey(viewingPublicKey);
+    const { prefix: spendingPubKeyPrefix, key: spendingPubKey } =
+      parsePublicKey(spendingPublicKey);
+    const { prefix: viewingPubKeyPrefix, key: viewingPubKey } =
+      parsePublicKey(viewingPublicKey);
 
     try {
       // @ts-ignore
@@ -212,23 +286,159 @@ const SetupPage = () => {
         spendingPubKeyPrefix,
         spendingPubKey,
         viewingPubKeyPrefix,
-        viewingPubKey
+        viewingPubKey,
       );
-      
+
       // Optionally, you can wait for the transaction to be mined
       await tx.wait();
-      
+
       console.log('Stealth meta address registered successfully');
-    }catch(e) {
-      console.log(e)
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const calculateStealthAddressSender = async () => {
+    const receiverAddress = await getUserAddress();
+    console.log('Calculating stealth address');
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const signer = await provider.getSigner();
+
+    const contract: any = new ethers.Contract(
+      CONTRACT_ADDRESS,
+      KEY_REGISTRY,
+      signer,
+    );
+
+    if (!contract) return;
+
+    try {
+      // debugger;
+      const [
+        spendingPubKeyPrefix,
+        spendingPubKey,
+        viewingPubKeyPrefix,
+        viewingPubKey,
+        // @ts-ignore
+      ] = await contract.getStealthMetaAddress(receiverAddress);
+      // KLJUCEVI SA PREFIXOM
+      const state: MistState = await getSnapState();
+
+      console.log('stateSpendPubKey', state.spendingPublicKey);
+      console.log('stateViewingPubKey', state.viewingPublicKey);
+
+      console.log('prefix spend', spendingPubKeyPrefix);
+      console.log('prefix view', viewingPubKeyPrefix);
+
+      const fullSpendingPubKey =
+        spendingPubKeyPrefix.toString() + spendingPubKey.toString();
+      const fullViewingKey =
+        viewingPubKeyPrefix.toString() + viewingPubKey.toString();
+
+      console.log('fullSpend', fullSpendingPubKey);
+      console.log('fullView', fullViewingKey);
+
+      // Convert BigInts to hex strings
+      // NEMAJU PREFIX
+      const spendingPubKeyHex = BigInt(spendingPubKey).toString(16);
+      const viewingPubKeyHex = BigInt(viewingPubKey).toString(16);
+
+      console.log('contract spendingPubKey', spendingPubKeyHex);
+      console.log('contract viewingPubKey', viewingPubKeyHex);
+
+      // // Ensure the hex strings are properly padded to 64 characters (32 bytes)
+      const spendingPubKeyPadded = spendingPubKeyHex.padStart(64, '0');
+      const viewingPubKeyPadded = viewingPubKeyHex.padStart(64, '0');
+
+      console.log(spendingPubKeyPadded);
+      console.log(viewingPubKeyPadded); // check if 0x exists
+
+      // // Convert the padded hex strings to secp.Point objects
+      const spendingPublicKey = secp.Point.fromHex(spendingPubKeyPadded);
+      const viewingPublicKey = secp.Point.fromHex(viewingPubKeyPadded);
+
+      // // Generate random ephemeral priv  console.log()ate key r
+      const r = secp.utils.randomPrivateKey();
+
+      // // Calculate the ephemeral public key R = r * G
+      const ephemeralPublicKeyCompressed = secp.getPublicKey(r, true);
+
+      const sharedSecret = secp.getSharedSecret(r, viewingPublicKey);
+      console.log(sharedSecret);
+      const hashedSharedSecret = sha3.keccak_256(
+        Buffer.from(sharedSecret.slice(1)),
+      );
+
+      // // Generate point from shared secret
+      const hashedSharedSecretPoint = secp.Point.fromPrivateKey(
+        Buffer.from(hashedSharedSecret, 'hex'),
+      );
+
+      const stealthPublicKey = spendingPublicKey.add(hashedSharedSecretPoint);
+      const stAA = sha3
+        .keccak_256(
+          Uint8Array.prototype.slice.call(
+            Buffer.from(stealthPublicKey.toHex(), 'hex'),
+            1,
+          ),
+        )
+        .toString();
+
+      const stealthAddress = stAA.slice(-40);
+      console.log('stealth address:', stealthAddress);
+      return ephemeralPublicKeyCompressed;
+      // //console.log('stealth address:', stealthAddress);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const calculateStealthAddressReceiver = async () => {
+    console.log('CALCULATE STEALTH RECEIVER');
+    const R = await calculateStealthAddressSender();
+    const state = await getSnapState();
+
+    try {
+      const sharedSecret = secp.getSharedSecret(
+        BigInt(state.viewingPrivateKey as string),
+        R as Uint8Array,
+      );
+      console.log(sharedSecret);
+
+      const hashedSharedSecret = sha3.keccak_256(
+        Buffer.from(sharedSecret.slice(1)),
+      );
+      const hashedSharedSecretPoint = secp.Point.fromPrivateKey(
+        Buffer.from(hashedSharedSecret, 'hex'),
+      );
+
+      const spendingPubKey = (state.spendingPublicKey as string).slice(4);
+      const spendingPubKeyHex = spendingPubKey;
+
+      const spendingPublicKey = secp.Point.fromHex(spendingPubKeyHex);
+
+      const stealthPublicKey = spendingPublicKey.add(hashedSharedSecretPoint);
+      const stAA = sha3
+        .keccak_256(
+          Uint8Array.prototype.slice.call(
+            Buffer.from(stealthPublicKey.toHex(), 'hex'),
+            1,
+          ),
+        )
+        .toString();
+
+      const stealthAddress = stAA.slice(-40);
+      console.log('stealth address 2:', stealthAddress);
+    } catch (e) {
+      console.log(e);
     }
   };
 
   const getSnapState = async () => {
     setLoadingSetup(true);
-    const state = await invokeSnap({
+    const state = (await invokeSnap({
       method: 'getState',
-    });
+    })) as Promise<MistState>;
 
     setKeysGenerated(true);
     setMistKeys(state);
@@ -254,7 +464,12 @@ const SetupPage = () => {
             ) : (
               <>
                 <SetupButton onClick={signMessage}>Setup</SetupButton>
-                <SetupButton onClick={getSnapState}>Setup</SetupButton>
+                <SetupButton onClick={() => calculateStealthAddressSender()}>
+                  Spender
+                </SetupButton>
+                <SetupButton onClick={() => calculateStealthAddressReceiver()}>
+                  Receiver
+                </SetupButton>
               </>
             )}
           </MAuto>
