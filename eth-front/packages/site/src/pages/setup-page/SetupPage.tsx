@@ -206,12 +206,6 @@ const SetupPage = () => {
     const { prefix: spendingPubKeyPrefix, key: spendingPubKey } = parsePublicKey(spendingPublicKey);
     const { prefix: viewingPubKeyPrefix, key: viewingPubKey } = parsePublicKey(viewingPublicKey);
 
-
-    console.log(spendingPubKeyPrefix);
-    console.log(viewingPubKeyPrefix);
-    console.log(spendingPubKey);
-    console.log(viewingPubKey);
-
     try {
       // @ts-ignore
       const tx = await contract.setStealthMetaAddress(
