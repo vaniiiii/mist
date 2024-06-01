@@ -86,7 +86,7 @@ const SetupPage = () => {
     : snapsDetected;
 
   const [message, setMessage] = useState(
-    'Sign this message to access your Myst account.',
+    'Sign this message to access your Mist account.',
   );
 
   const connectWalletBlock = () => {
@@ -180,7 +180,6 @@ const SetupPage = () => {
       <InfoBlock>
         {!installedSnap && connectWalletBlock()}
         {installedSnap && signMessageBlock()}
-    
       </InfoBlock>
     </Container>
   );
