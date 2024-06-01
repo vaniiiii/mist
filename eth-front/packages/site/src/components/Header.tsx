@@ -2,8 +2,8 @@ import styled, { useTheme } from 'styled-components';
 
 import { getThemePreference } from '../utils';
 import { HeaderButtons } from './Buttons';
-import { SnapLogo } from './SnapLogo';
 import { Toggle } from './Toggle';
+import Mist from './mistlogo.png';
 
 const HeaderWrapper = styled.header`
   display: flex;
@@ -12,6 +12,7 @@ const HeaderWrapper = styled.header`
   align-items: center;
   padding: 2.4rem;
   border-bottom: 1px solid ${(props) => props.theme.colors.border?.default};
+  background-color: black;
 `;
 
 const Title = styled.p`
@@ -19,9 +20,7 @@ const Title = styled.p`
   font-weight: bold;
   margin: 0;
   margin-left: 1.2rem;
-  ${({ theme }) => theme.mediaQueries.small} {
-    display: none;
-  }
+  color: whitesmoke;
 `;
 
 const LogoWrapper = styled.div`
@@ -46,8 +45,8 @@ export const Header = ({
   return (
     <HeaderWrapper>
       <LogoWrapper>
-        <SnapLogo color={theme.colors.icon?.default} size={36} />
-        <Title>template-snap</Title>
+        <img src={Mist} alt="Mist Protocol" width="80" height="80" />
+        <Title>Mist Protocol</Title>
       </LogoWrapper>
       <RightContainer>
         <Toggle
