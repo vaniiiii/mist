@@ -2,16 +2,16 @@
 pragma solidity 0.8.24;
 
 import {console} from "forge-std/console.sol";
-import {Myst} from "../../contracts/Myst.sol";
+import {Mist} from "../../contracts/Mist.sol";
 import {SoladyTest} from "@solady/test/utils/SoladyTest.sol";
 import {MockERC20} from "../../contracts/mocks/MockERC20.sol";
 import {MockERC721} from "../../contracts/mocks/MockERC721.sol";
 
-contract MystTest is SoladyTest {
+contract MistTest is SoladyTest {
     uint256 public constant SCHEME_ID = 1; // For secp256k1 elliptic curve is 1
     address immutable i_deployer;
 
-    Myst myst;
+    Mist mist;
     MockERC20 mockERC20;
     MockERC721 mockERC721;
 
@@ -23,8 +23,8 @@ contract MystTest is SoladyTest {
         bytes metadata
     );
 
-    error Myst__InvalidAmount();
-    error Myst__AddressZero();
+    error Mist__InvalidAmount();
+    error Mist__AddressZero();
 
     constructor() {
         i_deployer = msg.sender;
@@ -32,7 +32,7 @@ contract MystTest is SoladyTest {
 
     function setUp() public {
         vm.startPrank(i_deployer);
-        myst = new Myst();
+        mist = new Mist();
         mockERC20 = new MockERC20();
         mockERC721 = new MockERC721();
         vm.stopPrank();
@@ -49,7 +49,7 @@ contract MystTest is SoladyTest {
         vm.deal(sender, amount);
 
         vm.prank(sender);
-        myst.sendEth{value: amount}(receiver, ephemeralPubKey, metadata);
+        mist.sendEth{value: amount}(receiver, ephemeralPubKey, metadata);
 
         assertEq(address(receiver).balance, balanceBefore + amount);
     }
@@ -62,7 +62,7 @@ contract MystTest is SoladyTest {
 
         vm.deal(sender, amount);
 
-        vm.expectEmit(true, true, true, true, address(myst));
+        vm.expectEmit(true, true, true, true, address(mist));
         emit Announcement(
             SCHEME_ID,
             receiver,
@@ -72,7 +72,7 @@ contract MystTest is SoladyTest {
         );
 
         vm.prank(sender);
-        myst.sendEth{value: amount}(receiver, ephemeralPubKey, metadata);
+        mist.sendEth{value: amount}(receiver, ephemeralPubKey, metadata);
     }
     function test_sendETHInvalidAmount() external {
         uint256 amount = 0;
@@ -84,8 +84,8 @@ contract MystTest is SoladyTest {
         vm.deal(sender, amount);
 
         vm.prank(sender);
-        vm.expectRevert(Myst__InvalidAmount.selector);
-        myst.sendEth{value: amount}(receiver, ephemeralPubKey, metadata);
+        vm.expectRevert(Mist__InvalidAmount.selector);
+        mist.sendEth{value: amount}(receiver, ephemeralPubKey, metadata);
     }
     function test_sendETHAddressZero() external {
         uint256 amount = _bound(_random(), 0.1 ether, 10 ether);
@@ -97,8 +97,8 @@ contract MystTest is SoladyTest {
         vm.deal(sender, amount);
 
         vm.prank(sender);
-        vm.expectRevert(Myst__AddressZero.selector);
-        myst.sendEth{value: amount}(receiver, ephemeralPubKey, metadata);
+        vm.expectRevert(Mist__AddressZero.selector);
+        mist.sendEth{value: amount}(receiver, ephemeralPubKey, metadata);
     }
     function test_sendERC20() external {
         uint256 amount = _bound(_random(), 0.1 ether, 100 ether);
@@ -112,8 +112,8 @@ contract MystTest is SoladyTest {
 
         vm.startPrank(sender);
         mockERC20.mint(sender, amount);
-        mockERC20.approve(address(myst), amount);
-        myst.sendERC20(
+        mockERC20.approve(address(mist), amount);
+        mist.sendERC20(
             receiver,
             tokenAddress,
             amount,
@@ -134,9 +134,9 @@ contract MystTest is SoladyTest {
 
         vm.startPrank(sender);
         mockERC20.mint(sender, amount);
-        mockERC20.approve(address(myst), amount);
+        mockERC20.approve(address(mist), amount);
 
-        vm.expectEmit(true, true, true, true, address(myst));
+        vm.expectEmit(true, true, true, true, address(mist));
         emit Announcement(
             SCHEME_ID,
             receiver,
@@ -145,7 +145,7 @@ contract MystTest is SoladyTest {
             metadata
         );
 
-        myst.sendERC20(
+        mist.sendERC20(
             receiver,
             tokenAddress,
             amount,
@@ -164,10 +164,10 @@ contract MystTest is SoladyTest {
 
         vm.startPrank(sender);
         mockERC20.mint(sender, amount);
-        mockERC20.approve(address(myst), amount);
+        mockERC20.approve(address(mist), amount);
 
-        vm.expectRevert(Myst__InvalidAmount.selector);
-        myst.sendERC20(
+        vm.expectRevert(Mist__InvalidAmount.selector);
+        mist.sendERC20(
             receiver,
             tokenAddress,
             amount,
@@ -186,10 +186,10 @@ contract MystTest is SoladyTest {
 
         vm.startPrank(sender);
         mockERC20.mint(sender, amount);
-        mockERC20.approve(address(myst), amount);
+        mockERC20.approve(address(mist), amount);
 
-        vm.expectRevert(Myst__AddressZero.selector);
-        myst.sendERC20(
+        vm.expectRevert(Mist__AddressZero.selector);
+        mist.sendERC20(
             receiver,
             tokenAddress,
             amount,
@@ -208,8 +208,8 @@ contract MystTest is SoladyTest {
 
         vm.startPrank(sender);
         mockERC721.mint(sender, tokenId);
-        mockERC721.approve(address(myst), tokenId);
-        myst.sendERC721(
+        mockERC721.approve(address(mist), tokenId);
+        mist.sendERC721(
             receiver,
             tokenAddress,
             tokenId,
@@ -231,9 +231,9 @@ contract MystTest is SoladyTest {
 
         vm.startPrank(sender);
         mockERC721.mint(sender, tokenId);
-        mockERC721.approve(address(myst), tokenId);
+        mockERC721.approve(address(mist), tokenId);
 
-        vm.expectEmit(true, true, true, true, address(myst));
+        vm.expectEmit(true, true, true, true, address(mist));
         emit Announcement(
             SCHEME_ID,
             receiver,
@@ -242,7 +242,7 @@ contract MystTest is SoladyTest {
             metadata
         );
 
-        myst.sendERC721(
+        mist.sendERC721(
             receiver,
             tokenAddress,
             tokenId,
@@ -262,10 +262,10 @@ contract MystTest is SoladyTest {
 
         vm.startPrank(sender);
         mockERC721.mint(sender, tokenId);
-        mockERC721.approve(address(myst), tokenId);
+        mockERC721.approve(address(mist), tokenId);
 
-        vm.expectRevert(Myst__AddressZero.selector);
-        myst.sendERC721(
+        vm.expectRevert(Mist__AddressZero.selector);
+        mist.sendERC721(
             receiver,
             tokenAddress,
             tokenId,

@@ -6,12 +6,12 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 /**
- * @title  Myst
+ * @title  Mist
  * @author vani(@vaniiiii)
- * @notice Myst is smart contract for stealth payments on EVM blockchain networks.
+ * @notice Mist is smart contract for stealth payments on EVM blockchain networks.
  *         Inspired by UMBRA protocol
  */
-contract Myst {
+contract Mist {
     //////////////////////////////////////////////////////////////////////////
     //                             Custom types                             //
     //////////////////////////////////////////////////////////////////////////
@@ -36,8 +36,8 @@ contract Myst {
     //////////////////////////////////////////////////////////////////////////
     //                                Error                                 //
     //////////////////////////////////////////////////////////////////////////
-    error Myst__InvalidAmount();
-    error Myst__AddressZero();
+    error Mist__InvalidAmount();
+    error Mist__AddressZero();
 
     //////////////////////////////////////////////////////////////////////////
     //                            External functions                        //
@@ -55,10 +55,10 @@ contract Myst {
         bytes calldata metadata
     ) external payable {
         if (msg.value == 0) {
-            revert Myst__InvalidAmount();
+            revert Mist__InvalidAmount();
         }
         if (receiver == address(0)) {
-            revert Myst__AddressZero();
+            revert Mist__AddressZero();
         }
 
         (bool success, ) = payable(receiver).call{value: address(this).balance}(
@@ -90,10 +90,10 @@ contract Myst {
         bytes calldata metadata
     ) external {
         if (amount == 0) {
-            revert Myst__InvalidAmount();
+            revert Mist__InvalidAmount();
         }
         if (receiver == address(0) || tokenAddress == address(0)) {
-            revert Myst__AddressZero();
+            revert Mist__AddressZero();
         }
 
         IERC20(tokenAddress).safeTransferFrom(msg.sender, receiver, amount);
@@ -121,7 +121,7 @@ contract Myst {
         bytes calldata metadata
     ) external {
         if (receiver == address(0) || tokenAddress == address(0)) {
-            revert Myst__AddressZero();
+            revert Mist__AddressZero();
         }
 
         IERC721(tokenAddress).transferFrom(msg.sender, receiver, tokenId);
