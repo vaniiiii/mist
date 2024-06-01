@@ -19,7 +19,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   origin,
   request,
 }) => {
-  console.log(request);
   switch (request.method) {
     case 'hello':
       return snap.request({
@@ -35,25 +34,47 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
           ]),
         },
       });
-      case 'update':
-        console.log("updatejtujem")
-        return snap.request({
-          method: 'snap_manageState',
-          params: {
-            operation: 'update',
-            newState: {
-              publicKey: "sdasdads"
-            }
+    case 'updateState':
+      const {
+        spendingPublicKey,
+        viewingPublicKey,
+        spendingPrivateKey,
+        viewingPrivateKey,
+      } = request.params as {
+        spendingPublicKey: string;
+        viewingPublicKey: string;
+        spendingPrivateKey: string;
+        viewingPrivateKey: string;
+      };
+      return snap.request({
+        method: 'snap_manageState',
+        params: {
+          operation: 'update',
+          newState: {
+            spendingPublicKey: spendingPublicKey,
+            viewingPublicKey: viewingPublicKey,
+            spendingPrivateKey: spendingPrivateKey,
+            viewingPrivateKey: viewingPrivateKey,
           },
-        })
-        case 'get':
-          return snap.request({
-            method: 'snap_manageState',
-            params: {
-              operation: 'get',
-              encrypted: false
-            }
-          })
+          encrypted: false,
+        },
+      });
+    case 'getState':
+      return snap.request({
+        method: 'snap_manageState',
+        params: {
+          operation: 'get',
+          encrypted: false,
+        },
+      });
+    case 'clearState':
+      return snap.request({
+        method: 'snap_manageState',
+        params: {
+          operation: 'clear',
+          encrypted: false,
+        },
+      });
     default:
       throw new Error('Method not found.');
   }
