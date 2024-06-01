@@ -59,6 +59,7 @@
   },
   "dependencies": {
     "bootstrap": "^5.3.3",
+    "ethers": "^6.12.1",
     "react-bootstrap": "^2.10.2"
   }
 }

@@ -16751,6 +16751,7 @@ __metadata:
     eslint-plugin-n: ^15.7.0
     eslint-plugin-prettier: ^4.2.1
     eslint-plugin-promise: ^6.1.1
+    ethers: ^6.12.1
     prettier: ^2.7.1
     prettier-plugin-packagejson: ^2.2.18
     react-bootstrap: ^2.10.2

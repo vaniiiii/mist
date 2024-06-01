@@ -1,13 +1,13 @@
 {
   "version": "0.1.0",
-  "description": "An example Snap written in TypeScript.",
-  "proposedName": "TypeScript Example",
+  "description": "Snap for Mist Protocol",
+  "proposedName": "Mist Snap 🌫️",
   "repository": {
     "type": "git",
     "url": "https://github.com/MetaMask/template-snap-monorepo.git"
   },
   "source": {
-    "shasum": "vKsIVolni98VI2pXX7fpdqQKExxZ26hw9HRUGdsgVWE=",
+    "shasum": "arpF7rioz6qWVay8/BeQz8SxzH/kZNC7syq5phPhdJo=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
