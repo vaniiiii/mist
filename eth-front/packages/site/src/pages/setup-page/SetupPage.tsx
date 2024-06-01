@@ -12,6 +12,8 @@ import styled from 'styled-components';
 import { ethers, hexlify, toUtf8Bytes } from 'ethers';
 import { Maybe } from '@metamask/providers/dist/types/utils';
 import toast, { Toaster } from 'react-hot-toast';
+import { Spinner } from 'react-bootstrap';
+import { KEY_REGISTRY } from '../../abis/KeyRegistry';
 
 const Container = styled.div`
   display: flex;
@@ -75,18 +77,39 @@ const SignTitle = styled.div`
   margin-bottom: 1rem;
 `;
 
+interface MistState {
+  spendingPublicKey: string;
+  viewingPublicKey: string;
+}
+
+const CONTRACT_ADDRESS = '0xB975979f60EE73A9b0E807cD11634300d1f26644';
+
 const SetupPage = () => {
+  const [loadingSetup, setLoadingSetup] = useState(false);
+  const [keysGenerated, setKeysGenerated] = useState(false);
+  const [mistKeys, setMistKeys] = useState<any>(null);
+
   const { error, provider } = useMetaMaskContext();
   const { isFlask, snapsDetected, installedSnap } = useMetaMask();
   const requestSnap = useRequestSnap();
   const invokeSnap = useInvokeSnap();
+
+  useEffect(() => {
+    const readState = async () => {
+      const snapState = await getSnapState();
+
+      if (snapState === null) return;
+      setKeysGenerated(true);
+      setMistKeys(snapState);
+    };
+  }, []);
 
   const isMetaMaskReady = isLocalSnap(defaultSnapOrigin)
     ? isFlask
     : snapsDetected;
 
   const [message, setMessage] = useState(
-    'Sign this message to access your Myst account.',
+    'Sign this message to access your Mist account.',
   );
 
   const connectWalletBlock = () => {
@@ -103,6 +126,7 @@ const SetupPage = () => {
   };
 
   const signMessage = async () => {
+    setLoadingSetup(true);
     const msg = hexlify(toUtf8Bytes(message));
 
     const accounts: Maybe<string[]> = await provider?.request({
@@ -146,14 +170,80 @@ const SetupPage = () => {
         viewingPrivateKey: keyPair2.privateKey,
       },
     });
+
+    await registerKeyContract({
+      spendingPublicKey,
+      viewingPublicKey
+    });
+    setLoadingSetup(false);
+    toast.success('Successfully Generated Mist Keys');
+  };
+
+  const registerKeyContract = async (state: MistState) => {
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const signer = await provider.getSigner();
+
+    const contract = new ethers.Contract(
+      CONTRACT_ADDRESS,
+      KEY_REGISTRY,
+      signer,
+    );
+
+    if(!contract) return;
+
+    let {spendingPublicKey, viewingPublicKey} = state;
+
+    console.log(spendingPublicKey);
+    console.log(viewingPublicKey);
+
+    const parsePublicKey = (publicKey: string) => {
+      const hexString = publicKey.startsWith('0x') ? publicKey.slice(2) : publicKey;
+      const prefix = parseInt(hexString.slice(0, 2), 16);
+      const key = BigInt('0x' + hexString.slice(2));
+      return { prefix, key };
+    };
+
+    const { prefix: spendingPubKeyPrefix, key: spendingPubKey } = parsePublicKey(spendingPublicKey);
+    const { prefix: viewingPubKeyPrefix, key: viewingPubKey } = parsePublicKey(viewingPublicKey);
+
+
+    console.log(spendingPubKeyPrefix);
+    console.log(viewingPubKeyPrefix);
+    console.log(spendingPubKey);
+    console.log(viewingPubKey);
+
+    try {
+      // @ts-ignore
+      const tx = await contract.setStealthMetaAddress(
+        spendingPubKeyPrefix,
+        spendingPubKey,
+        viewingPubKeyPrefix,
+        viewingPubKey
+      );
+      
+      // Optionally, you can wait for the transaction to be mined
+      await tx.wait();
+      
+      console.log('Stealth meta address registered successfully');
+    }catch(e) {
+      console.log(e)
+    }
   };
 
   const getSnapState = async () => {
+    setLoadingSetup(true);
     const state = await invokeSnap({
       method: 'getState',
     });
 
-    console.log(state);
+    setKeysGenerated(true);
+    setMistKeys(state);
+    setLoadingSetup(false);
+    return state;
+  };
+
+  const keysGeneratedBlock = () => {
+    return <>{mistKeys.spendingPublicKey}</>;
   };
 
   const signMessageBlock = () => {
@@ -165,8 +255,14 @@ const SetupPage = () => {
         </InfoBlockText>
         <DFlex>
           <MAuto>
-            <SetupButton onClick={signMessage}>Setup</SetupButton>
-            <SetupButton onClick={getSnapState}>Read State</SetupButton>
+            {loadingSetup ? (
+              <Spinner />
+            ) : (
+              <>
+                <SetupButton onClick={signMessage}>Setup</SetupButton>
+                <SetupButton onClick={getSnapState}>Setup</SetupButton>
+              </>
+            )}
           </MAuto>
         </DFlex>
       </SignContent>
@@ -179,8 +275,8 @@ const SetupPage = () => {
       <Heading>Setup</Heading>
       <InfoBlock>
         {!installedSnap && connectWalletBlock()}
-        {installedSnap && signMessageBlock()}
-    
+        {installedSnap && !keysGenerated && signMessageBlock()}
+        {keysGenerated && keysGeneratedBlock()}
       </InfoBlock>
     </Container>
   );
