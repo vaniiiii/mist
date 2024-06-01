@@ -4,7 +4,7 @@ Welcome to Mist! This project expands the concept of stealth addresses for priva
 
 ### What is Mist? 🌟
 
-Mist is a privacy-focused protocol that enables stealth addresses for private transactions on Ethereum. It leverages the foundational ideas from the Base SAP paper and extends them to include ERC721 tokens. Mist enhances security and user experience by using MetaMask Snaps to store spending/viewing keys in encrypted data storage and to send notifications to users.
+Mist is a privacy-focused protocol that enables stealth addresses for private transactions on Ethereum. It leverages the foundational ideas from the Base SAP paper and extends them to include ERC721 tokens. Mist enhances security and user experience by using MetaMask Snaps to store spending/viewing keys in encrypted data storage and to send notifications to users. It utilizes elliptic curve cryptography to achieve this level of security and privacy.
 
 ### Key Features 🚀
 
