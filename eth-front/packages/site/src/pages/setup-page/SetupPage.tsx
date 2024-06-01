@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, ConnectButton, ReconnectButton } from '../../components';
 import { defaultSnapOrigin } from '../../config';
 import {
@@ -76,10 +76,6 @@ const SignTitle = styled.div`
 `;
 
 const SetupPage = () => {
-  const [message, setMessage] = useState(
-    'Sign this message to access your Myst account.',
-  );
-
   const { error, provider } = useMetaMaskContext();
   const { isFlask, snapsDetected, installedSnap } = useMetaMask();
   const requestSnap = useRequestSnap();
@@ -89,9 +85,9 @@ const SetupPage = () => {
     ? isFlask
     : snapsDetected;
 
-  const handleSendHelloClick = async () => {
-    await invokeSnap({ method: 'hello' });
-  };
+  const [message, setMessage] = useState(
+    'Sign this message to access your Myst account.',
+  );
 
   const connectWalletBlock = () => {
     return (
@@ -141,34 +137,20 @@ const SetupPage = () => {
     const spendingPublicKey = keyPair1.signingKey.compressedPublicKey;
     const viewingPublicKey = keyPair2.signingKey.compressedPublicKey;
 
-    console.log(spendingPublicKey);
-    console.log(viewingPublicKey);
-
-    const state = await invokeSnap({
-      method: 'update',
+    await invokeSnap({
+      method: 'updateState',
       params: {
         spendingPublicKey,
         viewingPublicKey,
+        spendingPrivateKey: keyPair1.privateKey,
+        viewingPrivateKey: keyPair2.privateKey,
       },
     });
-
-    // const state = await provider?.request({
-    //   method: 'snap_manageState',
-    //   params: {
-    //     operation: 'update',
-    //     newState: {
-    //       spendingPublicKey,
-    //       viewingPublicKey,
-    //     },
-    //   },
-    // });
-
-    console.log(state);
   };
 
   const getSnapState = async () => {
     const state = await invokeSnap({
-      method: 'get'
+      method: 'getState',
     });
 
     console.log(state);
@@ -198,6 +180,7 @@ const SetupPage = () => {
       <InfoBlock>
         {!installedSnap && connectWalletBlock()}
         {installedSnap && signMessageBlock()}
+    
       </InfoBlock>
     </Container>
   );
