@@ -3,6 +3,8 @@ import { Form, Button, Container, Dropdown, DropdownButton } from 'react-bootstr
 import { ethers } from 'ethers';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './SendPage.css';
+import { ERC20 } from '../../abis/ERC20';
+import toast from 'react-hot-toast';
 
 const SendPage: React.FC = () => {
     const [recipient, setRecipient] = useState<string>('');
@@ -16,6 +18,27 @@ const SendPage: React.FC = () => {
         "function sendEth(address receiver, bytes memory ephemeralPubKey, bytes memory metadata)",
         "function sendERC20(address receiver, address tokenAddress, uint256 amount, bytes memory metadata)"
     ];
+
+    const approveERC20Txn = async (tokenAddress:string, tokenSpenderAddress: string, value: bigint) => {
+        try {
+            const provider = new ethers.BrowserProvider(window.ethereum);
+            const signer = await provider.getSigner();
+            const contract = new ethers.Contract(tokenAddress, ERC20, signer); 
+            console.log(tokenAddress, tokenSpenderAddress, value)
+            if(contract && contract.approve){
+                const approveTx = await contract.approve(tokenSpenderAddress, value, {gasLimit: 50000});
+
+                await approveTx.wait();
+
+                return true;
+            }
+
+            return false
+        }catch(e){
+            console.log(e);
+            return false
+        }
+    }
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
@@ -44,6 +67,10 @@ const SendPage: React.FC = () => {
                 const value = ethers.parseUnits(amount, 18); // Adjust the decimal places according to the token
                 const metadata = ethers.hexlify('0x'); // Placeholder for metadata
                 if (contract && contract.sendERC20) { // Check if contract and sendERC20 method are defined
+                    // const approveTxn = await approveERC20Txn(tokenAddress, MYST_CONTRACT_ADDRESS, value);
+
+                    // if(!approveTxn) return toast.error("Error approving the transaction");
+
                     tx = await contract.sendERC20(recipient, tokenAddress, value, metadata);
                 }
             }
@@ -70,6 +97,8 @@ const SendPage: React.FC = () => {
                 return '0xdAC17F958D2ee523a2206206994597C13D831ec7'; // Sepolia USDT address if different
             case 'USDC':
                 return '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606EB48'; // Sepolia USDC address if different
+            case 'MIST':
+                return '0xC21e26f5453393c88D2fE67B41Aa76aBB0A30109';
             default:
                 return '0x0000000000000000000000000000000000000000';
         }
@@ -101,6 +130,7 @@ const SendPage: React.FC = () => {
                         <Dropdown.Item eventKey="ETH">ETH</Dropdown.Item>
                         <Dropdown.Item eventKey="USDT">USDT</Dropdown.Item>
                         <Dropdown.Item eventKey="USDC">USDC</Dropdown.Item>
+                        <Dropdown.Item eventKey="MIST">MIST</Dropdown.Item>
                     </DropdownButton>
                 </Form.Group>
 

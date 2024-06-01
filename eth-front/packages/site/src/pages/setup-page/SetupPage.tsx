@@ -464,12 +464,12 @@ const SetupPage = () => {
             ) : (
               <>
                 <SetupButton onClick={signMessage}>Setup</SetupButton>
-                <SetupButton onClick={() => calculateStealthAddressSender()}>
+                {/* <SetupButton onClick={() => calculateStealthAddressSender()}>
                   Spender
-                </SetupButton>
-                <SetupButton onClick={() => calculateStealthAddressReceiver()}>
+                </SetupButton> */}
+                {/* <SetupButton onClick={() => calculateStealthAddressReceiver()}>
                   Receiver
-                </SetupButton>
+                </SetupButton> */}
               </>
             )}
           </MAuto>
