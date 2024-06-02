@@ -1,6 +1,32 @@
 ## Mist Protocol 🌫️
 
-Welcome to Mist! This project expands the concept of stealth addresses for private transactions on Ethereum, inspired by the Base SAP paper and incorporating support for ERC721 tokens alongside ETH and ERC20 tokens. Mist also integrates MetaMask Snaps for secure key storage and user notifications, promoting interoperability between different protocols supporting stealth addresses.
+Welcome to Mist! This project expands the concept of stealth addresses for private transactions on Ethereum, inspired by the [Base SAP paper](https://arxiv.org/abs/2306.14272) and incorporating support for ERC721 tokens alongside ETH and ERC20 tokens. Mist also integrates MetaMask Snaps for secure key storage and user notifications, promoting interoperability between different protocols supporting stealth addresses.
+
+📜 Contracts are deployed and verified on the following networks:
+
+- **Sepolia** 🟢
+
+  - Key Registry: [`0xC77484F08f260c571922C112C2AB671093ce1fA9`](https://sepolia.etherscan.io/address/0xC77484F08f260c571922C112C2AB671093ce1fA9)
+  - Mist: [`0x6f4ef23960C89145896ee15140128e1b93925668`](https://sepolia.etherscan.io/address/0x6f4ef23960C89145896ee15140128e1b93925668)
+
+- **Optimism Sepolia** 🟠
+
+  - Key Registry: [`0xAc158bd90Df4088DeADbDe55eB8ddd92f9dA67Ff`](https://sepolia-optimism.etherscan.io/address/0xAc158bd90Df4088DeADbDe55eB8ddd92f9dA67Ff)
+  - Mist: [`0xE40c06Eb4409949eeB49a748a0Bed74b21967800`](https://sepolia-optimism.etherscan.io/address/0xE40c06Eb4409949eeB49a748a0Bed74b21967800)
+
+- **BSC Testnet** 🟡
+
+  - Key Registry: [`0x54dF6628Af4fFE86b56885C528115639E3805563`](https://testnet.bscscan.com/address/0x54dF6628Af4fFE86b56885C528115639E3805563)
+  - Mist: [`0xAc158bd90Df4088DeADbDe55eB8ddd92f9dA67Ff`](https://testnet.bscscan.com/address/0xAc158bd90Df4088DeADbDe55eB8ddd92f9dA67Ff)
+
+- **Linea Sepolia** 🟤
+
+  - Key Registry: [`0x54dF6628Af4fFE86b56885C528115639E3805563`](https://sepolia.lineascan.build/address/0x54dF6628Af4fFE86b56885C528115639E3805563)
+  - Mist: [`0xAc158bd90Df4088DeADbDe55eB8ddd92f9dA67Ff`](https://sepolia.lineascan.build/address/0x54dF6628Af4fFE86b56885C528115639E3805563)
+
+- **Neon EVM** 🟣
+  - Key Registry: [`0x54dF6628Af4fFE86b56885C528115639E3805563`](https://devnet.neonscan.org/address/0x54dF6628Af4fFE86b56885C528115639E3805563)
+  - Mist: [`0xAc158bd90Df4088DeADbDe55eB8ddd92f9dA67Ff`](0xAc158bd90Df4088DeADbDe55eB8ddd92f9dA67Ff)
 
 ### What is Mist? 🌟
 
