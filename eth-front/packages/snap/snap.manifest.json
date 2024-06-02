@@ -7,7 +7,7 @@
     "url": "https://github.com/MetaMask/template-snap-monorepo.git"
   },
   "source": {
-    "shasum": "arpF7rioz6qWVay8/BeQz8SxzH/kZNC7syq5phPhdJo=",
+    "shasum": "F3UGpiiT+YWZHyVRBcSj71rRgqZ5hd5wHRlrxbGVHPk=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
@@ -24,7 +24,7 @@
       "snaps": false,
       "allowedOrigins": [
         "https://metamask.io",
-        "https://localhost:8545",
+        "https://sepolia.gateway.tenderly.co",
         "https://metamask.io",
         "https://consensys.io",
         "npm:@metamask/example-snap"
