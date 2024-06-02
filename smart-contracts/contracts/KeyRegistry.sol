@@ -11,12 +11,6 @@ import {console} from "forge-std/Test.sol";
  */
 contract KeyRegistry {
     //////////////////////////////////////////////////////////////////////////
-    //                              Constants                               //
-    //////////////////////////////////////////////////////////////////////////
-    uint256 public constant N =
-        115792089237316195423570985008687907852837564279074904382605163141518161494337; // secp256k1 order
-
-    //////////////////////////////////////////////////////////////////////////
     //                          Storage variables                           //
     //////////////////////////////////////////////////////////////////////////
     mapping(address userAddress => mapping(uint256 keyPrefix => uint256 keyValue))
@@ -146,10 +140,10 @@ contract KeyRegistry {
             revert KeyRegistry__InvalidPrefix();
         }
         // Check if keys are valid
-        if (spendingPubKey == 0 || spendingPubKey >= N) {
+        if (spendingPubKey == 0) {
             revert KeyRegistry__InvalidKeyValue();
         }
-        if (viewingPubKey == 0 || viewingPubKey >= N) {
+        if (viewingPubKey == 0) {
             revert KeyRegistry__InvalidKeyValue();
         }
 

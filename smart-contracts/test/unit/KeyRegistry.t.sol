@@ -7,9 +7,6 @@ import {KeyRegistryHarness} from "./KeyRegistryHarness.sol";
 import {SoladyTest} from "@solady/test/utils/SoladyTest.sol";
 
 contract KeyRegister is SoladyTest {
-    uint256 public constant N =
-        115792089237316195423570985008687907852837564279074904382605163141518161494337;
-
     address immutable i_deployer;
 
     KeyRegistry keyRegistry;
@@ -44,9 +41,9 @@ contract KeyRegister is SoladyTest {
         external
     {
         uint256 spendingPubKeyPrefix = _bound(_random(), 0, 1);
-        uint256 spendingPubKey = _bound(_random(), 1, N);
+        uint256 spendingPubKey = _random();
         uint256 viewingPubKeyPrefix = 3;
-        uint256 viewingPubKey = _bound(_random(), 1, N);
+        uint256 viewingPubKey = _random();
 
         vm.prank(address(keyRegistryHarness));
         vm.expectRevert(KeyRegistry__InvalidPrefix.selector);
@@ -62,9 +59,9 @@ contract KeyRegister is SoladyTest {
         external
     {
         uint256 spendingPubKeyPrefix = 2;
-        uint256 spendingPubKey = _bound(_random(), 1, N);
+        uint256 spendingPubKey = _random();
         uint256 viewingPubKeyPrefix = _bound(_random(), 0, 1);
-        uint256 viewingPubKey = _bound(_random(), 1, N);
+        uint256 viewingPubKey = _random();
 
         vm.prank(address(keyRegistryHarness));
         vm.expectRevert(KeyRegistry__InvalidPrefix.selector);
@@ -80,9 +77,9 @@ contract KeyRegister is SoladyTest {
         external
     {
         uint256 spendingPubKeyPrefix = _bound(_random(), 4, type(uint256).max);
-        uint256 spendingPubKey = _bound(_random(), 1, N);
+        uint256 spendingPubKey = _random();
         uint256 viewingPubKeyPrefix = 3;
-        uint256 viewingPubKey = _bound(_random(), 1, N);
+        uint256 viewingPubKey = _random();
 
         vm.prank(address(keyRegistryHarness));
         vm.expectRevert(KeyRegistry__InvalidPrefix.selector);
@@ -98,9 +95,9 @@ contract KeyRegister is SoladyTest {
         external
     {
         uint256 spendingPubKeyPrefix = 2;
-        uint256 spendingPubKey = _bound(_random(), 1, N);
+        uint256 spendingPubKey = _random();
         uint256 viewingPubKeyPrefix = _bound(_random(), 4, type(uint256).max);
-        uint256 viewingPubKey = _bound(_random(), 1, N);
+        uint256 viewingPubKey = _random();
 
         vm.prank(address(keyRegistryHarness));
         vm.expectRevert(KeyRegistry__InvalidPrefix.selector);
@@ -116,7 +113,7 @@ contract KeyRegister is SoladyTest {
         uint256 spendingPubKeyPrefix = 2;
         uint256 spendingPubKey = 0;
         uint256 viewingPubKeyPrefix = 3;
-        uint256 viewingPubKey = _bound(_random(), 1, N);
+        uint256 viewingPubKey = _random();
 
         vm.prank(address(keyRegistryHarness));
         vm.expectRevert(KeyRegistry__InvalidKeyValue.selector);
@@ -130,41 +127,9 @@ contract KeyRegister is SoladyTest {
 
     function test__checkStealthMetaAddressViewingPubKeyZero() external {
         uint256 spendingPubKeyPrefix = 2;
-        uint256 spendingPubKey = _bound(_random(), 1, N);
+        uint256 spendingPubKey = _random();
         uint256 viewingPubKeyPrefix = 3;
         uint256 viewingPubKey = 0;
-
-        vm.prank(address(keyRegistryHarness));
-        vm.expectRevert(KeyRegistry__InvalidKeyValue.selector);
-        keyRegistryHarness.exposed_checkStealthMetaAddress(
-            spendingPubKeyPrefix,
-            spendingPubKey,
-            viewingPubKeyPrefix,
-            viewingPubKey
-        );
-    }
-
-    function test__checkStealthMetaAddressSpendingPubKeyHigher() external {
-        uint256 spendingPubKeyPrefix = 2;
-        uint256 spendingPubKey = _bound(_random(), N + 1, type(uint256).max);
-        uint256 viewingPubKeyPrefix = 3;
-        uint256 viewingPubKey = _bound(_random(), 1, N);
-
-        vm.prank(address(keyRegistryHarness));
-        vm.expectRevert(KeyRegistry__InvalidKeyValue.selector);
-        keyRegistryHarness.exposed_checkStealthMetaAddress(
-            spendingPubKeyPrefix,
-            spendingPubKey,
-            viewingPubKeyPrefix,
-            viewingPubKey
-        );
-    }
-
-    function test__checkStealthMetaAddressViewingPubKeyHigher() external {
-        uint256 spendingPubKeyPrefix = 2;
-        uint256 spendingPubKey = _bound(_random(), 1, N);
-        uint256 viewingPubKeyPrefix = 3;
-        uint256 viewingPubKey = _bound(_random(), N + 1, type(uint256).max);
 
         vm.prank(address(keyRegistryHarness));
         vm.expectRevert(KeyRegistry__InvalidKeyValue.selector);
@@ -180,9 +145,9 @@ contract KeyRegister is SoladyTest {
         external
     {
         uint256 spendingPubKeyPrefix = 2;
-        uint256 spendingPubKey = _bound(_random(), 1, N);
+        uint256 spendingPubKey = _random();
         uint256 viewingPubKeyPrefix = 3;
-        uint256 viewingPubKey = _bound(_random(), 1, N);
+        uint256 viewingPubKey = _random();
 
         address caller = _randomNonZeroAddress();
 
@@ -209,9 +174,9 @@ contract KeyRegister is SoladyTest {
     // ==== setStealthMetaAddress ==== //
     function test_setStealthMetaAddress() public {
         uint256 spendingPubKeyPrefix = 2;
-        uint256 spendingPubKey = _bound(_random(), 1, N);
+        uint256 spendingPubKey = _random();
         uint256 viewingPubKeyPrefix = 3;
-        uint256 viewingPubKey = _bound(_random(), 1, N);
+        uint256 viewingPubKey = _random();
 
         address caller = _randomNonZeroAddress();
 
@@ -242,9 +207,9 @@ contract KeyRegister is SoladyTest {
         external
     {
         uint256 spendingPubKeyPrefix = 2;
-        uint256 spendingPubKey = _bound(_random(), 1, N);
+        uint256 spendingPubKey = _random();
         uint256 viewingPubKeyPrefix = 3;
-        uint256 viewingPubKey = _bound(_random(), 1, N);
+        uint256 viewingPubKey = _random();
 
         address caller = _randomNonZeroAddress();
 
@@ -268,9 +233,9 @@ contract KeyRegister is SoladyTest {
 
     function test_setStealthMetaAddressInvalidPrefixSpendingKey() external {
         uint256 spendingPubKeyPrefix = _bound(_random(), 0, 1);
-        uint256 spendingPubKey = _bound(_random(), 1, N);
+        uint256 spendingPubKey = _random();
         uint256 viewingPubKeyPrefix = 3;
-        uint256 viewingPubKey = _bound(_random(), 1, N);
+        uint256 viewingPubKey = _random();
 
         address caller = _randomNonZeroAddress();
 
@@ -286,9 +251,9 @@ contract KeyRegister is SoladyTest {
 
     function test_setStealthMetaAddressInvalidPrefixViewingKey() external {
         uint256 spendingPubKeyPrefix = 2;
-        uint256 spendingPubKey = _bound(_random(), 1, N);
+        uint256 spendingPubKey = _random();
         uint256 viewingPubKeyPrefix = _bound(_random(), 0, 1);
-        uint256 viewingPubKey = _bound(_random(), 1, N);
+        uint256 viewingPubKey = _random();
 
         address caller = _randomNonZeroAddress();
 
@@ -306,9 +271,9 @@ contract KeyRegister is SoladyTest {
         external
     {
         uint256 spendingPubKeyPrefix = _bound(_random(), 4, type(uint256).max);
-        uint256 spendingPubKey = _bound(_random(), 1, N);
+        uint256 spendingPubKey = _random();
         uint256 viewingPubKeyPrefix = 3;
-        uint256 viewingPubKey = _bound(_random(), 1, N);
+        uint256 viewingPubKey = _random();
 
         address caller = _randomNonZeroAddress();
 
@@ -326,9 +291,9 @@ contract KeyRegister is SoladyTest {
         external
     {
         uint256 spendingPubKeyPrefix = 2;
-        uint256 spendingPubKey = _bound(_random(), 1, N);
+        uint256 spendingPubKey = _random();
         uint256 viewingPubKeyPrefix = _bound(_random(), 4, type(uint256).max);
-        uint256 viewingPubKey = _bound(_random(), 1, N);
+        uint256 viewingPubKey = _random();
 
         address caller = _randomNonZeroAddress();
 
@@ -346,7 +311,7 @@ contract KeyRegister is SoladyTest {
         uint256 spendingPubKeyPrefix = 2;
         uint256 spendingPubKey = 0;
         uint256 viewingPubKeyPrefix = 3;
-        uint256 viewingPubKey = _bound(_random(), 1, N);
+        uint256 viewingPubKey = _random();
 
         address caller = _randomNonZeroAddress();
 
@@ -362,45 +327,9 @@ contract KeyRegister is SoladyTest {
 
     function test_setStealthMetaAddressViewingPubKeyZero() external {
         uint256 spendingPubKeyPrefix = 2;
-        uint256 spendingPubKey = _bound(_random(), 1, N);
+        uint256 spendingPubKey = _random();
         uint256 viewingPubKeyPrefix = 3;
         uint256 viewingPubKey = 0;
-
-        address caller = _randomNonZeroAddress();
-
-        vm.prank(caller);
-        vm.expectRevert(KeyRegistry__InvalidKeyValue.selector);
-        keyRegistry.setStealthMetaAddress(
-            spendingPubKeyPrefix,
-            spendingPubKey,
-            viewingPubKeyPrefix,
-            viewingPubKey
-        );
-    }
-
-    function test_setStealthMetaAddressSpendingPubKeyHigher() external {
-        uint256 spendingPubKeyPrefix = 2;
-        uint256 spendingPubKey = _bound(_random(), N + 1, type(uint256).max);
-        uint256 viewingPubKeyPrefix = 3;
-        uint256 viewingPubKey = _bound(_random(), 1, N);
-
-        address caller = _randomNonZeroAddress();
-
-        vm.prank(caller);
-        vm.expectRevert(KeyRegistry__InvalidKeyValue.selector);
-        keyRegistry.setStealthMetaAddress(
-            spendingPubKeyPrefix,
-            spendingPubKey,
-            viewingPubKeyPrefix,
-            viewingPubKey
-        );
-    }
-
-    function test_setStealthMetaAddressViewingPubKeyHigher() external {
-        uint256 spendingPubKeyPrefix = 2;
-        uint256 spendingPubKey = _bound(_random(), 1, N);
-        uint256 viewingPubKeyPrefix = 3;
-        uint256 viewingPubKey = _bound(_random(), N + 1, type(uint256).max);
 
         address caller = _randomNonZeroAddress();
 
@@ -418,9 +347,9 @@ contract KeyRegister is SoladyTest {
         external
     {
         uint256 spendingPubKeyPrefix = 3;
-        uint256 spendingPubKey = _bound(_random(), 1, N);
+        uint256 spendingPubKey = _random();
         uint256 viewingPubKeyPrefix = 2;
-        uint256 viewingPubKey = _bound(_random(), 1, N);
+        uint256 viewingPubKey = _random();
 
         address caller = _randomNonZeroAddress();
 
@@ -447,9 +376,9 @@ contract KeyRegister is SoladyTest {
     // ==== getStealthMetaAddress ==== //
     function test_getStealthMetaAddressPrefix2And3() external {
         uint256 spendingPubKeyPrefix = 2;
-        uint256 spendingPubKey = _bound(_random(), 1, N);
+        uint256 spendingPubKey = _random();
         uint256 viewingPubKeyPrefix = 3;
-        uint256 viewingPubKey = _bound(_random(), 1, N);
+        uint256 viewingPubKey = _random();
 
         address caller = _randomNonZeroAddress();
 
@@ -476,9 +405,9 @@ contract KeyRegister is SoladyTest {
 
     function test_getStealthMetaAddressPrefix2And2() external {
         uint256 spendingPubKeyPrefix = 2;
-        uint256 spendingPubKey = _bound(_random(), 1, N);
+        uint256 spendingPubKey = _random();
         uint256 viewingPubKeyPrefix = 2;
-        uint256 viewingPubKey = _bound(_random(), 1, N);
+        uint256 viewingPubKey = _random();
 
         address caller = _randomNonZeroAddress();
 
@@ -505,9 +434,9 @@ contract KeyRegister is SoladyTest {
 
     function test_getStealthMetaAddressPrefix3And2() external {
         uint256 spendingPubKeyPrefix = 3;
-        uint256 spendingPubKey = _bound(_random(), 1, N);
+        uint256 spendingPubKey = _random();
         uint256 viewingPubKeyPrefix = 2;
-        uint256 viewingPubKey = _bound(_random(), 1, N);
+        uint256 viewingPubKey = _random();
 
         address caller = _randomNonZeroAddress();
 
@@ -534,9 +463,9 @@ contract KeyRegister is SoladyTest {
 
     function test_getStealthMetaAddressPrefix3And3() external {
         uint256 spendingPubKeyPrefix = 3;
-        uint256 spendingPubKey = _bound(_random(), 1, N);
+        uint256 spendingPubKey = _random();
         uint256 viewingPubKeyPrefix = 3;
-        uint256 viewingPubKey = _bound(_random(), 1, N);
+        uint256 viewingPubKey = _random();
 
         address caller = _randomNonZeroAddress();
 
