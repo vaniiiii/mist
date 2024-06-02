@@ -41,7 +41,7 @@ const Heading = styled.h1`
 `;
 
 const InfoBlock = styled.div`
-  width: 30vw;
+  width: 40vw;
   min-height: 20vh;
   background-color: ${({ theme }) => theme.colors.card?.default};
 
@@ -77,6 +77,10 @@ const SignTitle = styled.div`
   text-align: center;
 
   margin-bottom: 1rem;
+`;
+
+const UserKeys = styled.div`
+  text-align: center;
 `;
 
 interface MistState {
@@ -240,12 +244,18 @@ const SetupPage = () => {
       },
     });
 
+    setMistKeys({
+      spendingPublicKey: uint8ArrayToHex(spendingPublicKey),
+      viewingPublicKey: uint8ArrayToHex(viewingPublicKey),
+    });
+
     await registerKeyContract({
       spendingPublicKey: uint8ArrayToHex(spendingPublicKey),
       viewingPublicKey: uint8ArrayToHex(viewingPublicKey),
     });
 
     setLoadingSetup(false);
+    setKeysGenerated(true);
     toast.success('Successfully Generated Mist Keys');
   };
 
@@ -447,7 +457,31 @@ const SetupPage = () => {
   };
 
   const keysGeneratedBlock = () => {
-    return <>{mistKeys.spendingPublicKey}</>;
+    return (
+      <UserKeys>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            marginBottom: '2rem',
+          }}
+        >
+          <SignTitle>Spending Public Key</SignTitle>
+          <div>{mistKeys.spendingPublicKey}</div>
+        </div>
+
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            marginBottom: '1rem',
+          }}
+        >
+          <SignTitle>Viewing Public Key</SignTitle>
+          <div>{mistKeys.viewingPublicKey}</div>
+        </div>
+      </UserKeys>
+    );
   };
 
   const signMessageBlock = () => {
