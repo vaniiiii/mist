@@ -83,7 +83,7 @@ const UserKeys = styled.div`
   text-align: center;
 `;
 
-interface MistState {
+export interface MistState {
   spendingPublicKey: string;
   viewingPublicKey: string;
   spendingPrivateKey?: string;
@@ -197,10 +197,8 @@ const SetupPage = () => {
 
     // Ovde vadite prvi bajt i cuvate ga kao prefix (0x02 ili 0x03 mora biti)
     const spendingPublicKey = secp.getPublicKey(privateKey1, true); // kG
-    console.log('spendingPublicKey: ', spendingPublicKey);
     // Ovde vadite prvi bajt i cuvate ga kao prefix (0x02 ili 0x03 mora biti)
     const viewingPublicKey = secp.getPublicKey(privateKey2, true); // vG
-    console.log('viewingPublicKey: ', viewingPublicKey);
     // Na contract saljete prefix kao uint256 i bez prefixa ostatak isto kao uint256
     // Primer: 0x0312131, saljete 3 kao prefix i 12131 kao key
 
@@ -209,18 +207,16 @@ const SetupPage = () => {
 
     // Calculate the ephemeral public key R = r * G
     const ephemeralPublicKeyCompressed = secp.getPublicKey(r, true);
-    console.log('ephemeralPublicKeyCompressed', ephemeralPublicKeyCompressed);
 
     // shared secret = r * vG
     const sharedSecret = secp.getSharedSecret(r, viewingPublicKey);
-    console.log('sharedSecret:', sharedSecret);
 
     // shared secret 2 = v * rG, they should be equal
     const sharedSecret2 = secp.getSharedSecret(
       privateKey2,
       ephemeralPublicKeyCompressed,
     );
-    console.log('sharedSecret2:', sharedSecret2);
+
     let boolValue = true;
     for (let i = 0; i < sharedSecret.length; i++) {
       if (sharedSecret[i] !== sharedSecret2[i]) {
@@ -228,12 +224,7 @@ const SetupPage = () => {
         break;
       }
     }
-    console.log('sharedSecrets are equal:', boolValue);
 
-    console.log('spendingPubKey', uint8ArrayToHex(spendingPublicKey));
-    console.log('viewingPubKey', uint8ArrayToHex(viewingPublicKey));
-    console.log('privateKey1', privateKey1);
-    console.log('privateKey2', privateKey2);
     await invokeSnap({
       method: 'updateState',
       params: {
@@ -272,9 +263,6 @@ const SetupPage = () => {
     if (!contract) return;
 
     let { spendingPublicKey, viewingPublicKey } = state;
-
-    console.log(spendingPublicKey);
-    console.log(viewingPublicKey);
 
     const parsePublicKey = (publicKey: string) => {
       const hexString = publicKey.startsWith('0x')
@@ -334,34 +322,19 @@ const SetupPage = () => {
       // KLJUCEVI SA PREFIXOM
       const state: MistState = await getSnapState();
 
-      console.log('stateSpendPubKey', state.spendingPublicKey);
-      console.log('stateViewingPubKey', state.viewingPublicKey);
-
-      console.log('prefix spend', spendingPubKeyPrefix);
-      console.log('prefix view', viewingPubKeyPrefix);
-
       const fullSpendingPubKey =
         spendingPubKeyPrefix.toString() + spendingPubKey.toString();
       const fullViewingKey =
         viewingPubKeyPrefix.toString() + viewingPubKey.toString();
-
-      console.log('fullSpend', fullSpendingPubKey);
-      console.log('fullView', fullViewingKey);
 
       // Convert BigInts to hex strings
       // NEMAJU PREFIX
       const spendingPubKeyHex = BigInt(spendingPubKey).toString(16);
       const viewingPubKeyHex = BigInt(viewingPubKey).toString(16);
 
-      console.log('contract spendingPubKey', spendingPubKeyHex);
-      console.log('contract viewingPubKey', viewingPubKeyHex);
-
       // // Ensure the hex strings are properly padded to 64 characters (32 bytes)
       const spendingPubKeyPadded = spendingPubKeyHex.padStart(64, '0');
       const viewingPubKeyPadded = viewingPubKeyHex.padStart(64, '0');
-
-      console.log(spendingPubKeyPadded);
-      console.log(viewingPubKeyPadded); // check if 0x exists
 
       // // Convert the padded hex strings to secp.Point objects
       const spendingPublicKey = secp.Point.fromHex(spendingPubKeyPadded);
@@ -374,7 +347,6 @@ const SetupPage = () => {
       const ephemeralPublicKeyCompressed = secp.getPublicKey(r, true);
 
       const sharedSecret = secp.getSharedSecret(r, viewingPublicKey);
-      console.log(sharedSecret);
       const hashedSharedSecret = sha3.keccak_256(
         Buffer.from(sharedSecret.slice(1)),
       );
@@ -395,7 +367,6 @@ const SetupPage = () => {
         .toString();
 
       const stealthAddress = stAA.slice(-40);
-      console.log('stealth address:', stealthAddress);
       return ephemeralPublicKeyCompressed;
       // //console.log('stealth address:', stealthAddress);
     } catch (e) {
