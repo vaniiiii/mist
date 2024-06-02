@@ -280,17 +280,12 @@ const SendPage: React.FC = () => {
           </div>
         </Form.Group>
 
-        <Button
-          variant="primary"
-          type="submit"
-          className="send-button"
-          disabled={loading}
-        >
-          {loading ? 'Sending...' : 'Send'}
-        </Button>
-      </Form>
-    </Container>
-  );
+                <Button variant="primary" type="submit" className="send-button" disabled={loading}>
+                    {loading ? 'Sending...' : 'Send'}
+                </Button>
+            </Form>
+        </Container>
+    );
 };
 
 export default SendPage;
