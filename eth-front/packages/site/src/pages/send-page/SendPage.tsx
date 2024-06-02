@@ -267,6 +267,7 @@ const SendPage: React.FC = () => {
 
   return (
     <Container className="send-form-container">
+      <p className="sendText">Send ≋</p>
       <Form onSubmit={handleSubmit}>
         <Form.Group controlId="formRecipient">
           <Form.Label>Recipient's ENS name or address</Form.Label>
@@ -309,17 +310,12 @@ const SendPage: React.FC = () => {
           </div>
         </Form.Group>
 
-        <Button
-          variant="primary"
-          type="submit"
-          className="send-button"
-          disabled={loading}
-        >
-          {loading ? 'Sending...' : 'Send'}
-        </Button>
-      </Form>
-    </Container>
-  );
+                <Button variant="primary" type="submit" className="send-button" disabled={loading}>
+                    {loading ? 'Sending...' : 'Send'}
+                </Button>
+            </Form>
+        </Container>
+    );
 };
 
 export default SendPage;
