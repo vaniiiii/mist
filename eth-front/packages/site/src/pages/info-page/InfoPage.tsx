@@ -7,6 +7,9 @@ import {
 } from '../../hooks';
 import styled from 'styled-components';
 import { MistState } from '../setup-page/SetupPage';
+import { ethers, hexlify } from 'ethers';
+import * as sha3 from 'js-sha3';
+import * as secp from '@noble/secp256k1';
 
 const Container = styled.div`
   display: flex;
@@ -73,6 +76,7 @@ const SignTitle = styled.div`
 const UserKeys = styled.div`
   text-align: center;
 `;
+window.Buffer = window.Buffer || require('buffer').Buffer;
 
 const InfoPage = () => {
   const { error, provider } = useMetaMaskContext();
@@ -81,6 +85,79 @@ const InfoPage = () => {
   const invokeSnap = useInvokeSnap();
 
   const [privateLoaded, setPrivateLoaded] = useState(false);
+
+  let fromBlock = 0;
+  const providerJsonRpc = new ethers.JsonRpcProvider(
+    'https://sepolia.gateway.tenderly.co',
+  );
+
+  const contractAddress = '0x6f4ef23960C89145896ee15140128e1b93925668';
+
+  const contractABI = [
+    'event Announcement(uint256 indexed schemeId, address indexed stealthAddress, address indexed caller, bytes ephemeralPubKey, bytes metadata)',
+  ];
+
+  async function pollForEvents(blocksToQuery = 5000) {
+    const contract = new ethers.Contract(
+      contractAddress,
+      contractABI,
+      providerJsonRpc,
+    );
+
+    const latestBlock = await providerJsonRpc.getBlockNumber();
+    if (fromBlock === 0) {
+      fromBlock = latestBlock - blocksToQuery;
+    }
+
+    const eventInterface = new ethers.Interface(contractABI);
+
+    const events = await contract.queryFilter(
+      'Announcement',
+      fromBlock,
+      latestBlock,
+    );
+
+    const eventsFormatted = await Promise.all(
+      events.map(async (event) => {
+        const parsedLog = eventInterface.parseLog(event);
+        const { transactionHash } = event;
+        const transaction = await providerJsonRpc.getTransaction(
+          transactionHash,
+        );
+        const valueInEther = ethers.formatEther(
+          transaction?.value ?? BigInt(0),
+        );
+        return {
+          schemeId: parsedLog?.args.schemeId.toString(),
+          stealthAddress: parsedLog?.args.stealthAddress,
+          caller: parsedLog?.args.caller,
+          ephemeralPubKey: ethers.hexlify(parsedLog?.args.ephemeralPubKey),
+          metadata: ethers.hexlify(parsedLog?.args.metadata),
+          valueInEther,
+        };
+      }),
+    );
+
+    return {
+      eventsLength: events.length,
+      latestBlock,
+      eventsFormatted,
+      fromBlock,
+      events,
+    };
+  }
+
+  /**
+   * Get the latest event from the contract.
+   */
+  async function getEvents() {
+    const { eventsFormatted, latestBlock } = await pollForEvents();
+    fromBlock = latestBlock;
+    if (eventsFormatted.length === 0) {
+      return undefined;
+    }
+    return eventsFormatted.at(-1); // just for hackathon
+  }
 
   const getSnapState = async () => {
     const state = (await invokeSnap({
@@ -94,16 +171,43 @@ const InfoPage = () => {
     setPrivateLoaded(true);
 
     const state = await getSnapState();
-    console.log(state);
+
+    const lastEvent = await getEvents();
+    const stealth = lastEvent?.stealthAddress;
+    console.log(lastEvent);
+
+    const ephemeralSliced = (lastEvent?.ephemeralPubKey as string).slice(2);
+    const ephemeralPadded = ephemeralSliced.padStart(64, '0');
+    const ephemeralPoint = secp.Point.fromHex(ephemeralPadded);
+    
+    const sharedSecret = secp.getSharedSecret(
+      BigInt(state.viewingPrivateKey as string).toString(16),
+      ephemeralPoint,
+    );
+
+    const hashedSharedSecret = sha3.keccak_256(
+      Buffer.from(sharedSecret.slice(1)),
+    );
+    const hashedSharedSecretBigInt = BigInt('0x' + hashedSharedSecret);
+    const n =
+      '0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141';
+    const myPrivateKey =
+      (BigInt(hashedSharedSecret) +
+        BigInt((state.spendingPrivateKey as string))) %
+      BigInt(n);
+
+    console.log(myPrivateKey.toString(16));
   };
 
   const revealBlock = () => {
     return (
       <>
-        <InfoBlockText>Click the button to reveal private key </InfoBlockText>
+        <InfoBlockText>
+          Click the button to calculate your private key{' '}
+        </InfoBlockText>
         <DFlex>
           <MAuto>
-            <SetupButton onClick={calculatePrivateKey}>Reveal</SetupButton>
+            <SetupButton onClick={calculatePrivateKey}>Calculate</SetupButton>
           </MAuto>
         </DFlex>
       </>
