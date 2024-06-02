@@ -64,6 +64,7 @@ export const Header = ({
         <Navigation>
           <a href="/setup-page/SetupPage/">Home</a>
           <a href="/send-page/SendPage/">Send</a>
+          <a href="/info-page/InfoPage/">Info</a>
 
         </Navigation>
       </LogoWrapper>
