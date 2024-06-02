@@ -17,6 +17,13 @@
     color: white;
 }
 
+.sendText {
+    color: white;
+    font-size: 20px;
+    text-align: center;
+    font-weight: bold;
+}
+
 .custom-input {
     background-color: var(--color-4);
     border: none;
@@ -32,6 +39,10 @@
     color: white;
     padding: 10px;
     margin-bottom: 15px;
+}
+
+#dropdown-basic-button {
+    background-color: black;
 }
 
 .amount-input-group {

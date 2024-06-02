@@ -495,7 +495,7 @@ const SetupPage = () => {
   return (
     <Container>
       <Toaster position="top-right" reverseOrder={false} />
-      <Heading>Setup</Heading>
+      <Heading>Setup ⚙️</Heading>
       <InfoBlock>
         {!installedSnap && connectWalletBlock()}
         {installedSnap && !keysGenerated && signMessageBlock()}
