@@ -35,6 +35,20 @@ const RightContainer = styled.div`
   align-items: center;
 `;
 
+const Navigation = styled.div`
+  display: flex;
+  flex-direction: row;
+  font-size: ${(props) => props.theme.fontSizes.body};
+  align-items: center;
+  margin-left: 1.5rem;
+  a {
+    font-weight: bold;
+    color: whitesmoke;
+    text-decoration: none;
+    margin-right: 1.5rem;
+  }
+`;
+
 export const Header = ({
   handleToggleClick,
 }: {
@@ -47,6 +61,11 @@ export const Header = ({
       <LogoWrapper>
         <img src={Mist} alt="Mist Protocol" width="80" height="80" />
         <Title>Mist Protocol</Title>
+        <Navigation>
+          <a href="/setup-page/SetupPage/">Home</a>
+          <a href="/send-page/SendPage/">Send</a>
+
+        </Navigation>
       </LogoWrapper>
       <RightContainer>
         <Toggle
