@@ -4,6 +4,9 @@ import { getThemePreference } from '../utils';
 import { HeaderButtons } from './Buttons';
 import { Toggle } from './Toggle';
 import Mist from './mistlogo.png';
+import Send from './send.png';
+import Home from './home.png';
+import Info from './info.png';
 
 const HeaderWrapper = styled.header`
   display: flex;
@@ -62,9 +65,9 @@ export const Header = ({
         <img src={Mist} alt="Mist Protocol" width="80" height="80" />
         <Title>Mist Protocol</Title>
         <Navigation>
-          <a href="/setup-page/SetupPage/">Home</a>
-          <a href="/send-page/SendPage/">Send</a>
-          <a href="/info-page/InfoPage/">Info</a>
+          <a href="/setup-page/SetupPage/"><img src={Home} width="20" height="20" /> Home</a>
+          <a href="/send-page/SendPage/"><img src={Send} width="20" height="20" /> Send</a>
+          <a href="/info-page/InfoPage/"><img src={Info} width="20" height="20" /> Info</a>
 
         </Navigation>
       </LogoWrapper>
