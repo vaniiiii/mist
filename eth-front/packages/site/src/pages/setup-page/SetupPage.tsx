@@ -193,19 +193,11 @@ const SetupPage = () => {
       '0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141',
     );
 
-    // Ovo ide u contract ovako kao uint256(ne menja se format)
     const privateKey1 = ethers.getBigInt(hashedV) % n; // r analogija
     const privateKey2 = ethers.getBigInt(hashedR) % n;
 
-    console.log('privateKey1: ', privateKey1); // k -> spending key
-    console.log('privateKey2: ', privateKey2); // v -> viewing key
-
-    // Ovde vadite prvi bajt i cuvate ga kao prefix (0x02 ili 0x03 mora biti)
     const spendingPublicKey = secp.getPublicKey(privateKey1, true); // kG
-    // Ovde vadite prvi bajt i cuvate ga kao prefix (0x02 ili 0x03 mora biti)
     const viewingPublicKey = secp.getPublicKey(privateKey2, true); // vG
-    // Na contract saljete prefix kao uint256 i bez prefixa ostatak isto kao uint256
-    // Primer: 0x0312131, saljete 3 kao prefix i 12131 kao key
 
     // Generate random ephemeral private key r
     const r = secp.utils.randomPrivateKey(); // r

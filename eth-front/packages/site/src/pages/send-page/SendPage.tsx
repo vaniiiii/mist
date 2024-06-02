@@ -135,7 +135,7 @@ const SendPage: React.FC = () => {
       const hashedSharedSecret = sha3.keccak_256(
         Buffer.from(sharedSecret.slice(1)),
       );
-
+      console.log(hashedSharedSecret);
       // // Generate point from shared secret
       const hashedSharedSecretPoint = secp.Point.fromPrivateKey(
         Buffer.from(hashedSharedSecret, 'hex'),
@@ -152,7 +152,19 @@ const SendPage: React.FC = () => {
         .toString();
 
       const stealthAddress = stAA.slice(-40);
-      return `0x${stealthAddress}`;
+
+      const hashedSharedSecretBigInt = BigInt('0x' + hashedSharedSecret);
+      const n =
+        '0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141';
+      const myPrivateKey =
+        (hashedSharedSecretBigInt +
+          BigInt(state.spendingPrivateKey as string)) %
+        BigInt(n);
+      console.log("myprivatekey", myPrivateKey);
+      return {
+        stealthAddress: `0x${stealthAddress}`,
+        ephemeralPublicKey: ephemeralPublicKeyCompressed,
+      };
       // //console.log('stealth address:', stealthAddress);
     } catch (e) {
       console.log(e);
@@ -173,21 +185,23 @@ const SendPage: React.FC = () => {
       const signer = await provider.getSigner();
       const contract = new ethers.Contract(MIST_CONTRACT_ADDRESS, ABI, signer);
 
-      const recipientParsed = await calculateStealthAddressSender(recipient);
-      console.log(recipientParsed);
+      //   @ts-ignore
+      const { stealthAddress, ephemeralPublicKey } =
+        await calculateStealthAddressSender(recipient);
+      console.log(stealthAddress);
 
       let tx;
       if (selectedToken === 'ETH') {
         const value = ethers.parseEther(amount);
 
         console.log(value);
-        const ephemeralPubKey = ethers.hexlify('0x'); // Placeholder for public key
+
         const metadata = ethers.hexlify('0x'); // Placeholder for metadata
         if (contract && contract.sendEth) {
           // Check if contract and sendEth method are defined
           tx = await contract.sendEth(
-            recipientParsed,
-            ephemeralPubKey,
+            stealthAddress,
+            ephemeralPublicKey,
             metadata,
             {
               value,
@@ -211,9 +225,10 @@ const SendPage: React.FC = () => {
           }
 
           tx = await contract.sendERC20(
-            recipientParsed,
+            stealthAddress,
             tokenAddress,
             value,
+            ephemeralPublicKey,
             metadata,
           );
         }
