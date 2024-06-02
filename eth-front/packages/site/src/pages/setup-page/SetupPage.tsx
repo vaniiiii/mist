@@ -1,5 +1,14 @@
-import { useState, useEffect } from 'react';
-import { Card, ConnectButton, ReconnectButton } from '../../components';
+import type { Maybe } from '@metamask/providers/dist/types/utils';
+import * as secp from '@noble/secp256k1';
+import { ethers, hexlify, toUtf8Bytes } from 'ethers';
+import * as sha3 from 'js-sha3';
+import { useEffect, useState } from 'react';
+import { Spinner } from 'react-bootstrap';
+import toast, { Toaster } from 'react-hot-toast';
+import styled from 'styled-components';
+
+import { KEY_REGISTRY } from '../../abis/KeyRegistry';
+import { ConnectButton } from '../../components';
 import { defaultSnapOrigin } from '../../config';
 import {
   useInvokeSnap,
@@ -7,15 +16,7 @@ import {
   useMetaMaskContext,
   useRequestSnap,
 } from '../../hooks';
-import { isLocalSnap, shouldDisplayReconnectButton } from '../../utils';
-import styled from 'styled-components';
-import { ethers, hexlify, toUtf8Bytes } from 'ethers';
-import * as secp from '@noble/secp256k1';
-import * as sha3 from 'js-sha3';
-import { Maybe } from '@metamask/providers/dist/types/utils';
-import toast, { Toaster } from 'react-hot-toast';
-import { Spinner } from 'react-bootstrap';
-import { KEY_REGISTRY } from '../../abis/KeyRegistry';
+import { isLocalSnap } from '../../utils';
 
 const Container = styled.div`
   display: flex;
@@ -83,14 +84,14 @@ const UserKeys = styled.div`
   text-align: center;
 `;
 
-export interface MistState {
+export type MistState = {
   spendingPublicKey: string;
   viewingPublicKey: string;
   spendingPrivateKey?: string;
   viewingPrivateKey?: string;
-}
+};
 
-const CONTRACT_ADDRESS = '0xB975979f60EE73A9b0E807cD11634300d1f26644';
+const REGISTRY_CONTRACT_ADDRESS = '0xC77484F08f260c571922C112C2AB671093ce1fA9';
 window.Buffer = window.Buffer || require('buffer').Buffer;
 
 const SetupPage = () => {
@@ -107,7 +108,9 @@ const SetupPage = () => {
     const readState = async () => {
       const snapState = await getSnapState();
 
-      if (snapState === null) return;
+      if (snapState === null) {
+        return;
+      }
       setKeysGenerated(true);
       setMistKeys(snapState);
     };
@@ -139,26 +142,26 @@ const SetupPage = () => {
       method: 'eth_requestAccounts',
     });
 
-    if (!accounts || !accounts[0])
+    if (!accounts || !accounts[0]) {
       return toast.error("Can't acquire users accounts");
+    }
 
     return accounts[0];
   };
 
   const convert = (uint8Arr: Uint8Array) => {
-    var length = uint8Arr.length;
+    const { length } = uint8Arr;
 
-    let buffer = Buffer.from(uint8Arr);
-    var result = buffer.readUIntBE(0, length);
+    const buffer = Buffer.from(uint8Arr);
+    const result = buffer.readUIntBE(0, length);
 
     return result;
   };
 
   const uint8ArrayToHex = (arr: Uint8Array) => {
-    return (
-      '0x' +
-      Array.from(arr, (byte) => byte.toString(16).padStart(2, '0')).join('')
-    );
+    return `0x${Array.from(arr, (byte) =>
+      byte.toString(16).padStart(2, '0'),
+    ).join('')}`;
   };
 
   // Helper function to convert hex string to BigInt
@@ -177,13 +180,15 @@ const SetupPage = () => {
       params: [msg, account],
     });
 
-    if (!signature) return toast.error('Error signing the message');
+    if (!signature) {
+      return toast.error('Error signing the message');
+    }
 
     const sig1 = signature.slice(2, 66);
     const sig2 = signature.slice(66, 130);
 
-    const hashedV = ethers.sha256('0x' + sig1);
-    const hashedR = ethers.sha256('0x' + sig2);
+    const hashedV = ethers.sha256(`0x${sig1}`);
+    const hashedR = ethers.sha256(`0x${sig2}`);
     const n = ethers.getBigInt(
       '0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141',
     );
@@ -255,21 +260,23 @@ const SetupPage = () => {
     const signer = await provider.getSigner();
 
     const contract = new ethers.Contract(
-      CONTRACT_ADDRESS,
+      REGISTRY_CONTRACT_ADDRESS,
       KEY_REGISTRY,
       signer,
     );
 
-    if (!contract) return;
+    if (!contract) {
+      return;
+    }
 
-    let { spendingPublicKey, viewingPublicKey } = state;
+    const { spendingPublicKey, viewingPublicKey } = state;
 
     const parsePublicKey = (publicKey: string) => {
       const hexString = publicKey.startsWith('0x')
         ? publicKey.slice(2)
         : publicKey;
       const prefix = parseInt(hexString.slice(0, 2), 16);
-      const key = BigInt('0x' + hexString.slice(2));
+      const key = BigInt(`0x${hexString.slice(2)}`);
       return { prefix, key };
     };
 
@@ -303,12 +310,14 @@ const SetupPage = () => {
     const signer = await provider.getSigner();
 
     const contract: any = new ethers.Contract(
-      CONTRACT_ADDRESS,
+      REGISTRY_CONTRACT_ADDRESS,
       KEY_REGISTRY,
       signer,
     );
 
-    if (!contract) return;
+    if (!contract) {
+      return;
+    }
 
     try {
       // debugger;
@@ -393,7 +402,7 @@ const SetupPage = () => {
         Buffer.from(hashedSharedSecret, 'hex'),
       );
 
-      const spendingPubKey = (state.spendingPublicKey as string).slice(4);
+      const spendingPubKey = state.spendingPublicKey.slice(4);
       const spendingPubKeyHex = spendingPubKey;
 
       const spendingPublicKey = secp.Point.fromHex(spendingPubKeyHex);

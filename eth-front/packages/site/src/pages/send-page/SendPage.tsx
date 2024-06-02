@@ -1,30 +1,29 @@
+import * as secp from '@noble/secp256k1';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { ethers } from 'ethers';
+import * as sha3 from 'js-sha3';
 import React, { useState } from 'react';
 import {
-  Form,
   Button,
   Container,
   Dropdown,
   DropdownButton,
+  Form,
 } from 'react-bootstrap';
-import { ethers } from 'ethers';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import './SendPage.css';
-import { ERC20 } from '../../abis/ERC20';
 import toast from 'react-hot-toast';
-import * as secp from '@noble/secp256k1';
-import * as sha3 from 'js-sha3';
-import { MistState } from '../setup-page/SetupPage';
-import { defaultSnapOrigin } from '../../config';
+
+import { ERC20 } from '../../abis/ERC20';
+import { KEY_REGISTRY } from '../../abis/KeyRegistry';
 import {
   useInvokeSnap,
   useMetaMask,
   useMetaMaskContext,
   useRequestSnap,
 } from '../../hooks';
-import { isLocalSnap, shouldDisplayReconnectButton } from '../../utils';
-import { KEY_REGISTRY } from '../../abis/KeyRegistry';
+import type { MistState } from '../setup-page/SetupPage';
+import './SendPage.css';
 
-const CONTRACT_ADDRESS = '0xB975979f60EE73A9b0E807cD11634300d1f26644'; //KEY REGISTRY
+const REGISTRY_CONTRACT_ADDRESS = '0xC77484F08f260c571922C112C2AB671093ce1fA9'; // KEY REGISTRY
 window.Buffer = window.Buffer || require('buffer').Buffer;
 
 const SendPage: React.FC = () => {
@@ -38,7 +37,7 @@ const SendPage: React.FC = () => {
   const requestSnap = useRequestSnap();
   const invokeSnap = useInvokeSnap();
 
-  const MYST_CONTRACT_ADDRESS = '0xE6AdA1DE7EE4fB1DdeA8618966dd1f3C5B6D0aF7';
+  const MIST_CONTRACT_ADDRESS = '0x6f4ef23960C89145896ee15140128e1b93925668';
   const ABI = [
     'function sendERC721(address receiver, address tokenAddress, uint256 tokenId, bytes memory metadata)',
     'function sendEth(address receiver, bytes memory ephemeralPubKey, bytes memory metadata)',
@@ -87,12 +86,14 @@ const SendPage: React.FC = () => {
     const signer = await provider.getSigner();
 
     const contract: any = new ethers.Contract(
-      CONTRACT_ADDRESS,
+      REGISTRY_CONTRACT_ADDRESS,
       KEY_REGISTRY,
       signer,
     );
 
-    if (!contract) return;
+    if (!contract) {
+      return;
+    }
 
     try {
       // debugger;
@@ -151,7 +152,7 @@ const SendPage: React.FC = () => {
         .toString();
 
       const stealthAddress = stAA.slice(-40);
-      return "0x" + stealthAddress;
+      return `0x${stealthAddress}`;
       // //console.log('stealth address:', stealthAddress);
     } catch (e) {
       console.log(e);
@@ -170,23 +171,28 @@ const SendPage: React.FC = () => {
       await window.ethereum.request({ method: 'eth_requestAccounts' });
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
-      const contract = new ethers.Contract(MYST_CONTRACT_ADDRESS, ABI, signer);
+      const contract = new ethers.Contract(MIST_CONTRACT_ADDRESS, ABI, signer);
 
       const recipientParsed = await calculateStealthAddressSender(recipient);
       console.log(recipientParsed);
-      
+
       let tx;
       if (selectedToken === 'ETH') {
         const value = ethers.parseEther(amount);
 
-        console.log(value)
+        console.log(value);
         const ephemeralPubKey = ethers.hexlify('0x'); // Placeholder for public key
         const metadata = ethers.hexlify('0x'); // Placeholder for metadata
         if (contract && contract.sendEth) {
           // Check if contract and sendEth method are defined
-          tx = await contract.sendEth(recipientParsed, ephemeralPubKey, metadata, {
-            value
-          });
+          tx = await contract.sendEth(
+            recipientParsed,
+            ephemeralPubKey,
+            metadata,
+            {
+              value,
+            },
+          );
         }
       } else {
         const tokenAddress = getTokenAddress(selectedToken);
@@ -194,9 +200,15 @@ const SendPage: React.FC = () => {
         const metadata = ethers.hexlify('0x'); // Placeholder for metadata
         if (contract && contract.sendERC20) {
           // Check if contract and sendERC20 method are defined
-          const approveTxn = await approveERC20Txn(tokenAddress, MYST_CONTRACT_ADDRESS, value);
+          const approveTxn = await approveERC20Txn(
+            tokenAddress,
+            MIST_CONTRACT_ADDRESS,
+            value,
+          );
 
-          if(!approveTxn) return toast.error("Error approving the transaction");
+          if (!approveTxn) {
+            return toast.error('Error approving the transaction');
+          }
 
           tx = await contract.sendERC20(
             recipientParsed,
@@ -220,7 +232,9 @@ const SendPage: React.FC = () => {
   };
 
   const handleSelectToken = (token: string | null) => {
-    if (token) setSelectedToken(token);
+    if (token) {
+      setSelectedToken(token);
+    }
   };
 
   const getTokenAddress = (token: string): string => {
