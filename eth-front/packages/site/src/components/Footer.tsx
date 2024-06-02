@@ -31,18 +31,17 @@ const PoweredByContainer = styled.div`
   margin-left: 1rem;
 `;
 
+const FooterText = styled.div`
+  font-weight: 800;
+  font-size: 20px;
+`
+
 export const Footer = () => {
   const theme = useTheme();
 
   return (
     <FooterWrapper>
-      <PoweredByButton href="https://docs.metamask.io/" target="_blank">
-        <MetaMaskFox />
-        <PoweredByContainer>
-          <PoweredBy color={theme.colors.text?.muted} />
-          <MetaMask color={theme.colors.text?.default} />
-        </PoweredByContainer>
-      </PoweredByButton>
+      <FooterText>© 2024 Mist, Inc.</FooterText>      
     </FooterWrapper>
   );
 };
