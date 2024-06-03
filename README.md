@@ -26,7 +26,11 @@ Welcome to Mist! This project expands the concept of stealth addresses for priva
 
 - **Neon EVM** 🟣
   - Key Registry: [`0x54dF6628Af4fFE86b56885C528115639E3805563`](https://devnet.neonscan.org/address/0x54dF6628Af4fFE86b56885C528115639E3805563)
-  - Mist: [`0xAc158bd90Df4088DeADbDe55eB8ddd92f9dA67Ff`](0xAc158bd90Df4088DeADbDe55eB8ddd92f9dA67Ff)
+  - Mist: [`0xAc158bd90Df4088DeADbDe55eB8ddd92f9dA67Ff`](https://devnet.neonscan.org/address/0xAc158bd90Df4088DeADbDe55eB8ddd92f9dA67Ff)
+
+- **Mantle Sepolia** ⚫
+  - Key Registry: [`0x152593E82695A38f95d6F68fd7b350e51f11441e`](https://explorer.sepolia.mantle.xyz/address/0x152593E82695A38f95d6F68fd7b350e51f11441e)
+  - Mist: [`0xe1224F7b0eE01e9Ad70C2271b0CC611E933fCD85`](https://explorer.sepolia.mantle.xyz/address/0xe1224F7b0eE01e9Ad70C2271b0CC611E933fCD85)
 
 ### What is Mist? 🌟
 
