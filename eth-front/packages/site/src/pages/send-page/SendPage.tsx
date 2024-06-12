@@ -22,6 +22,7 @@ import {
 } from '../../hooks';
 import type { MistState } from '../setup-page/SetupPage';
 import './SendPage.css';
+import  SendImage from "./sendimage.png";
 
 const REGISTRY_CONTRACT_ADDRESS = '0xC77484F08f260c571922C112C2AB671093ce1fA9'; // KEY REGISTRY
 window.Buffer = window.Buffer || require('buffer').Buffer;
@@ -266,6 +267,8 @@ const SendPage: React.FC = () => {
   };
 
   return (
+    <div className="send-main">
+    <img src={SendImage} alt="Send" className="send-image" />
     <Container className="send-form-container">
       <p className="sendText">Send ≋</p>
       <Form onSubmit={handleSubmit}>
@@ -315,6 +318,8 @@ const SendPage: React.FC = () => {
                 </Button>
             </Form>
         </Container>
+        <img src={SendImage} alt="Send" className="send-image-second" />
+    </div>
     );
 };
 

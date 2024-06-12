@@ -61,6 +61,8 @@ const CardContainer = styled.div`
   width: 100%;
   height: 100%;
   margin-top: 1.5rem;
+  background-color: #bdcad9 !important;
+  background-image: linear-gradient(315deg, #bdcad9 0%, #e1dada 74%) !important;
 `;
 
 const Notice = styled.div`

@@ -6,27 +6,53 @@
     --color-5: #7c959d;
 }
 
+.send-main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: rgb(0,4,12);
+    
+
+}
+
+.send-image {
+    width: 30%;
+}
+
+.send-image-second {
+    width: 30%;
+    transform: rotateY(180deg);
+}
+
+
+
 .send-form-container {
     margin-top: 40px !important;
     margin-bottom: 40px !important;
     max-width: 400px;
     margin: 0 auto;
     padding: 20px;
-    background-color: var(--color-5);
+    background: rgb(0,4,12);
+    background: linear-gradient(90deg, rgba(0,4,12,1) 0%, rgba(51,85,114,1) 100%);
+
     border-radius: 10px;
-    color: white;
+    color: whitesmoke;
+    border: none;
+    font-weight: bold;
+    font-size: 12px;
 }
 
 .sendText {
-    color: white;
+    color: whitesmoke;
     font-size: 20px;
     text-align: center;
     font-weight: bold;
 }
 
 .custom-input {
-    background-color: var(--color-4);
-    border: none;
+ 
+    border: 1px solid lightgray;
     color: white;
     padding: 10px;
     margin-bottom: 15px;
@@ -34,8 +60,8 @@
 
 .custom-dropdown {
     width: 100%;
-    background-color: var(--color-4);
-    border: none;
+    background-color: whitesmoke;
+    border: 1px solid lightgray;
     color: white;
     padding: 10px;
     margin-bottom: 15px;
@@ -56,15 +82,16 @@
 
 .max-button {
     margin-left: 10px;
-    background-color: var(--color-3);
-    border: none;
-    color: black;
+    background-color: black;
+    border: 1px solid lightgray;
+    color: whitesmoke;
 }
 
 .send-button {
     width: 100%;
-    background-color: var(--color-2);
-    border: none;
+    background-color: black;
+    border: 1px solid lightgray;
     padding: 10px;
-    color: black;
+    color: whitesmoke;
+    
 }

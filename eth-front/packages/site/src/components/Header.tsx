@@ -14,8 +14,7 @@ const HeaderWrapper = styled.header`
   justify-content: space-between;
   align-items: center;
   padding: 2.4rem;
-  border-bottom: 1px solid ${(props) => props.theme.colors.border?.default};
-  background-color: black;
+  background-color: #00040C;
 `;
 
 const Title = styled.p`

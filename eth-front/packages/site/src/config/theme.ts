@@ -42,9 +42,10 @@ const theme = {
 export const light: DefaultTheme = {
   colors: {
     background: {
-      default: '#FFFFFF',
-      alternative: '#F2F4F6',
-      inverse: '#141618',
+      default: '#00040C',
+      alternative: '#00040C',
+      inverse: '#00040C',
+      
     },
     icon: {
       default: '#141618',
@@ -128,6 +129,7 @@ export const GlobalStyle = createGlobalStyle`
 
   body {
     background-color: ${(props) => props.theme.colors.background?.default};
+    background-image: ${(props) => props.theme.colors.background?.image}; // Add this line
     color: ${(props) => props.theme.colors.text?.default};
     font-family: ${(props) => props.theme.fonts.default};
     font-size: ${(props) => props.theme.fontSizes.text};
