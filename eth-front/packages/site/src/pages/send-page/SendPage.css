@@ -22,7 +22,7 @@
 
 .send-image-second {
     width: 30%;
-    transform: rotateY(180deg);
+    opacity: 0;
 }
 
 
