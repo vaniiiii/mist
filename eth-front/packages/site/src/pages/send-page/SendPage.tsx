@@ -22,7 +22,7 @@ import {
 } from '../../hooks';
 import type { MistState } from '../setup-page/SetupPage';
 import './SendPage.css';
-import  SendImage from "./sendimage.png";
+import  SendImage from "./mist.png";
 
 const REGISTRY_CONTRACT_ADDRESS = '0xC77484F08f260c571922C112C2AB671093ce1fA9'; // KEY REGISTRY
 window.Buffer = window.Buffer || require('buffer').Buffer;

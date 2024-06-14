@@ -17,12 +17,16 @@
 }
 
 .send-image {
-    width: 31%;
+    width: 40%;
+    opacity: 0.5;
+
 }
 
 .send-image-second {
-    width: 30%;
-    opacity: 0;
+    width: 40%;
+    transform: rotateY(180deg);
+    opacity: 0.5;
+  
 }
 
 
