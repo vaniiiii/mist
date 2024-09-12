@@ -63,16 +63,68 @@
 }
 
 .custom-dropdown {
-    width: 100%;
-    background-color: whitesmoke;
+    width: 100%;  /* Full width */
+    background-color: white;  /* White background */
     border: 1px solid lightgray;
-    color: white;
-    padding: 10px;
+    color: black;  /* Black text */
     margin-bottom: 15px;
+    border-radius: 5px;
+    font-weight: bold;
 }
 
 #dropdown-basic-button {
+    width: 100%;  /* Full width */
+    background-color: white;  /* White background */
+    border: 1px solid lightgray;
+    color: black;  /* Black text */
+    font-weight: bold;
+    align-items: center;
+    
+}
+
+.dropdown-menu.show {
+    width: 100%;  /* Make sure the dropdown menu also takes the full width */
+}
+
+#dropdown-basic-button::after {
+    display: none !important; /* Hide the default dropdown arrow */
+}
+
+.dropdown-toggle::after {
+    display: none !important; /* Ensure this works across dropdowns */
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    height: 50px; /* Adjust height to fit the icon and text properly */
+    padding: 10px 15px; /* Padding to give space around the icon */
+    font-weight: bold !important;
+}
+
+
+.dropdown-item svg {
+    margin-right: 10px; /* Space between the icon and the token name */
+    width: 32px; /* Ensure the icon size is consistent */
+    height: 32px; /* Ensure the icon size is consistent */
+}
+
+
+.send-button {
+    width: 100%;
     background-color: black;
+    border: 1px solid lightgray;
+    padding: 10px;
+    color: whitesmoke;
+    font-weight: bold;
+    
+}
+
+.send-button:hover {
+    background-color: whitesmoke;
+   border: 1px solid black;
+    color: black;
+   
 }
 
 .amount-input-group {

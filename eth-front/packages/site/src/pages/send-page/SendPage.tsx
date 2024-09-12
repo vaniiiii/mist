@@ -22,7 +22,10 @@ import {
 } from '../../hooks';
 import type { MistState } from '../setup-page/SetupPage';
 import './SendPage.css';
-import  SendImage from "./mist.png";
+import SendImage  from "./mist.png";
+import { ReactComponent as UsdtIcon } from "../../components/tether-cryptocurrency.svg";
+import { ReactComponent as UsdcIcon } from "../../components/usd-cryptocurrency.svg";
+import { ReactComponent as EtherIcon } from "../../components/ethereum-cryptocurrency.svg";
 
 const REGISTRY_CONTRACT_ADDRESS = '0xC77484F08f260c571922C112C2AB671093ce1fA9'; // KEY REGISTRY
 window.Buffer = window.Buffer || require('buffer').Buffer;
@@ -253,6 +256,29 @@ const SendPage: React.FC = () => {
     }
   };
 
+  const getSelectedTokenIcon = () => {
+    switch (selectedToken) {
+      case 'ETH':
+        return <EtherIcon width="40" height="40" />;
+      case 'USDT':
+        return <UsdtIcon width="40" height="40" />;
+      case 'USDC':
+        return <UsdcIcon width="40" height="40" />;
+      default:
+        return null;
+    }
+  };
+
+  const getDropdownTitle = () => {
+    return (
+      <span style={{ display: 'flex', alignItems: 'center' }}>
+        {getSelectedTokenIcon()}
+        Token: {selectedToken}
+      </span>
+    );
+  };
+
+
   const getTokenAddress = (token: string): string => {
     switch (token) {
       case 'USDT':
@@ -288,16 +314,16 @@ const SendPage: React.FC = () => {
           <Form.Label>Select token to send</Form.Label>
           <DropdownButton
             id="dropdown-basic-button"
-            title={`Token: ${selectedToken}`}
+            title={getDropdownTitle()}
             onSelect={handleSelectToken}
             className="custom-dropdown"
           >
-            <Dropdown.Item eventKey="ETH">ETH</Dropdown.Item>
-            <Dropdown.Item eventKey="USDT">USDT</Dropdown.Item>
-            <Dropdown.Item eventKey="USDC">USDC</Dropdown.Item>
-            <Dropdown.Item eventKey="MIST">MIST</Dropdown.Item>
+            <Dropdown.Item eventKey="ETH"><EtherIcon width="16" height="16" style={{ marginRight: '8px' }} /> ETH</Dropdown.Item>
+            <Dropdown.Item eventKey="USDT"><UsdtIcon width="16" height="16" style={{ marginRight: '8px' }} /> USDT</Dropdown.Item>
+            <Dropdown.Item eventKey="USDC"><UsdcIcon width="16" height="16" style={{ marginRight: '8px' }} /> USDC</Dropdown.Item>
           </DropdownButton>
         </Form.Group>
+       
 
         <Form.Group controlId="formAmount">
           <Form.Label>Amount</Form.Label>
