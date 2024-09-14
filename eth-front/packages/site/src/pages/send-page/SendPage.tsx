@@ -22,7 +22,6 @@ import {
 } from '../../hooks';
 import type { MistState } from '../setup-page/SetupPage';
 import './SendPage.css';
-import SendImage  from "./mist.png";
 import { ReactComponent as UsdtIcon } from "../../components/tether-cryptocurrency.svg";
 import { ReactComponent as UsdcIcon } from "../../components/usd-cryptocurrency.svg";
 import { ReactComponent as EtherIcon } from "../../components/ethereum-cryptocurrency.svg";
@@ -294,11 +293,10 @@ const SendPage: React.FC = () => {
 
   return (
     <div className="send-main">
-    <img src={SendImage} alt="Send" className="send-image" />
     <Container className="send-form-container">
       <p className="sendText">Send ≋</p>
       <Form onSubmit={handleSubmit}>
-        <Form.Group controlId="formRecipient">
+        <Form.Group controlId="formRecipient" className="formItem">
           <Form.Label>Recipient's ENS name or address</Form.Label>
           <Form.Control
             type="text"
@@ -309,9 +307,9 @@ const SendPage: React.FC = () => {
             className="custom-input"
           />
         </Form.Group>
-
-        <Form.Group controlId="formToken">
-          <Form.Label>Select token to send</Form.Label>
+      <div className="tokenAndAmount">
+        <Form.Group controlId="formToken" className="formItem formToken">
+          
           <DropdownButton
             id="dropdown-basic-button"
             title={getDropdownTitle()}
@@ -325,7 +323,7 @@ const SendPage: React.FC = () => {
         </Form.Group>
        
 
-        <Form.Group controlId="formAmount">
+        <Form.Group controlId="formAmount" className="formItem formAmount">
           <Form.Label>Amount</Form.Label>
           <div className="amount-input-group">
             <Form.Control
@@ -334,17 +332,19 @@ const SendPage: React.FC = () => {
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               required
-              className="custom-input"
+              className="formAmount"
             />
           </div>
         </Form.Group>
+      </div>
 
                 <Button variant="primary" type="submit" className="send-button" disabled={loading}>
                     {loading ? 'Sending...' : 'Send'}
                 </Button>
             </Form>
         </Container>
-        <img src={SendImage} alt="Send" className="send-image-second" />
+        
+        
     </div>
     );
 };

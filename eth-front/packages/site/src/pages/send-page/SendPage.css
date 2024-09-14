@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+
 :root {
     --color-1: #e0e7ea;
     --color-2: #bfd1d9;
@@ -6,79 +8,110 @@
     --color-5: #7c959d;
 }
 
+input[type=text] {
+    border: none !important;
+    outline: none !important;
+}
+
+input:focus {
+    border: none !important;
+    outline: none !important;
+}
+
+.formAmount {
+    border:none;
+    background-color: #F2F2F2;
+    font-size: 19px;
+    font-weight: 700;
+    text-align: left;
+    width: 100%;
+    outline: none;
+   
+    margin: 0 !important
+}
+
+
+
+.tokenAndAmount {
+    background-color: #F2F2F2;
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    border-radius: 0.5rem;
+}
+
+
+
 .send-main {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background: rgb(0,4,12);
+    background: black;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 700;
+    font-size: 19px !important;
     
 
 }
 
-.send-image {
-    width: 40%;
-    opacity: 0.5;
-
-}
-
-.send-image-second {
-    width: 40%;
-    transform: rotateY(180deg);
-    opacity: 0.5;
-  
+.formItem {
+    background: #F2F2F2;
+    padding: 1rem;
+    margin-bottom: 1.2rem;
+    border-radius: 0.5rem;
 }
 
 
 
 .send-form-container {
-    margin-top: 40px !important;
-    margin-bottom: 40px !important;
+
     max-width: 400px;
     margin: 0 auto;
     padding: 20px;
-    background: rgb(0,4,12);
-    background: linear-gradient(90deg, rgba(0,4,12,1) 0%, rgba(51,85,114,1) 100%);
+    background: #FFFFFF;
+   
+    
+   
+    
 
     border-radius: 10px;
-    color: whitesmoke;
-    border: none;
+    color:  #1E1E1E;
     font-weight: bold;
-    font-size: 12px;
+    font-size: 19px;
+    margin-bottom: 20rem !important;
 }
 
 .sendText {
-    color: whitesmoke;
-    font-size: 20px;
+    color: #1E1E1E;
+    font-size: 23px;
     text-align: center;
     font-weight: bold;
 }
 
-.custom-input {
- 
-    border: 1px solid lightgray;
-    color: white;
-    padding: 10px;
-    margin-bottom: 15px;
-}
+
 
 .custom-dropdown {
     width: 100%;  /* Full width */
     background-color: white;  /* White background */
-    border: 1px solid lightgray;
+    border: none !important;
+    outline: none !important;
     color: black;  /* Black text */
-    margin-bottom: 15px;
-    border-radius: 5px;
+    border-radius: 15px;
     font-weight: bold;
 }
 
 #dropdown-basic-button {
     width: 100%;  /* Full width */
     background-color: white;  /* White background */
-    border: 1px solid lightgray;
+    border: none !important;
+    outline: none !important;
     color: black;  /* Black text */
     font-weight: bold;
     align-items: center;
+    border-radius: 20px;
     
 }
 

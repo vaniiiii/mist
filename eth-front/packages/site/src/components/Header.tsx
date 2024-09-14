@@ -9,12 +9,14 @@ import Home from './home.png';
 import Info from './info.png';
 
 const HeaderWrapper = styled.header`
+
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   padding: 2.4rem;
-  background-color: #00040C;
+  background-color: black;
+  border-bottom: 1px solid whitesmoke;
 `;
 
 const Title = styled.p`
@@ -71,10 +73,7 @@ export const Header = ({
         </Navigation>
       </LogoWrapper>
       <RightContainer>
-        <Toggle
-          onToggle={handleToggleClick}
-          defaultChecked={getThemePreference()}
-        />
+        
         <HeaderButtons />
       </RightContainer>
     </HeaderWrapper>
